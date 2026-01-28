@@ -7,7 +7,10 @@ function ChangePassword() {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [error, setError] = useState("");
 
-    const updatePassword = () => {
+    const updatePassword = async (e) => {
+        e.preventDefault();
+        setError("");
+
         if (!newPassword || !confirmPassword) {
             setError("All fields are required");
             return;
@@ -18,63 +21,53 @@ function ChangePassword() {
             return;
         }
 
-        navigate("/dashboard");
+        try {
+            const response = { success: true };
+
+            if (response.success) {
+                localStorage.removeItem("token");
+                navigate("/login");
+            }
+        } catch (err) {
+            setError("Failed to update password");
+        }
     };
 
     return (
-        <div style={styles.container}>
-            <h2>Change Password</h2>
+        <div className="pg-login-page">
+            <div className="pg-login-box">
+                <h2 className="pg-login-title">Change Password</h2>
 
-            <input
-                style={styles.input}
-                type="password"
-                placeholder="New Password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-            />
+                {error && <div className="pg-login-error">{error}</div>}
 
-            <input
-                style={styles.input}
-                type="password"
-                placeholder="Confirm Password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-            />
+                <form onSubmit={updatePassword}>
+                    <div className="pg-form-group">
+                        <label className="pg-form-label">New Password</label>
+                        <input
+                            type="password"
+                            className="pg-form-input"
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                        />
+                    </div>
 
-            <button style={styles.button} onClick={updatePassword}>
-                Update Password
-            </button>
+                    <div className="pg-form-group">
+                        <label className="pg-form-label">Confirm Password</label>
+                        <input
+                            type="password"
+                            className="pg-form-input"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                        />
+                    </div>
 
-            <p style={styles.error}>{error}</p>
+                    <button type="submit" className="pg-login-btn">
+                        Update Password
+                    </button>
+                </form>
+            </div>
         </div>
     );
 }
-
-const styles = {
-    container: {
-        width: "300px",
-        margin: "100px auto",
-        padding: "30px",
-        textAlign: "center",
-        boxShadow: "0 0 10px rgba(0,0,0,0.1)",
-    },
-    input: {
-        width: "100%",
-        padding: "10px",
-        marginBottom: "12px",
-    },
-    button: {
-        width: "100%",
-        padding: "10px",
-        backgroundColor: "#2196F3",
-        color: "#fff",
-        border: "none",
-        cursor: "pointer",
-    },
-    error: {
-        color: "red",
-        marginTop: "10px",
-    },
-};
 
 export default ChangePassword;
