@@ -142,8 +142,3 @@ The frontend will run on `http://localhost:3000`
 - Backend runs on port 5000
 - Frontend runs on port 3000 (proxied to backend)
 - Make sure MySQL is running before starting the backend server
-
-
-
-
-# Qapla-IT
