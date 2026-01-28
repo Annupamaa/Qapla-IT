@@ -11,6 +11,7 @@ import SocietyUserList from './components/societyUsers/SocietyUserList'
 import SocietyUserForm from './components/societyUsers/SocietyUserForm'
 import Login from './components/Login/Login'
 import ChangePassword from './components/Login/ChangePassword'
+import ForgetPassword from './components/Login/ForgetPassword'
 
 import './App.css'
 
@@ -19,7 +20,8 @@ function AppLayout({ children }) {
 
   const isAuthPage =
     location.pathname === '/login' ||
-    location.pathname === '/change-password'
+    location.pathname === '/change-password' ||
+    location.pathname === '/forgot-password'
 
   return (
     <>
@@ -77,6 +79,7 @@ function App() {
             {/* Auth Pages */}
             <Route path="/login" element={<Login />} />
             <Route path="/change-password" element={<ChangePassword />} />
+            <Route path="/forgot-password" element={<ForgetPassword />} />
 
             {/* App Pages */}
             <Route path="/" element={<VendorList />} />
