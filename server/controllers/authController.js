@@ -77,6 +77,8 @@ const login = async (req, res) => {
     success: true,
     token,
     firstLogin: false,
+    role: user.role,
+    userType,
     redirectTo:
       userType === "vendor" ? "/vendor/dashboard" : "/society/dashboard",
   });

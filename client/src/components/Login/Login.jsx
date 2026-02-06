@@ -30,11 +30,16 @@ function Login() {
         return;
       }
 
+      localStorage.clear();
+
       if (response.firstLogin) {
         localStorage.setItem("token", response.token);
         navigate("/change-password");
       } else {
         localStorage.setItem("token", response.token);
+        localStorage.setItem("role", response.role);
+        localStorage.setItem("userType", response.userType);
+
         navigate(response.redirectTo);
       }
     } catch (err) {

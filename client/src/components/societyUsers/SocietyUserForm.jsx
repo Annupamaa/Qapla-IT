@@ -1,121 +1,124 @@
-import { useState, useEffect } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
-import { societyUsersAPI, societiesAPI } from '../../services/api'
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { societyUsersAPI, societiesAPI } from "../../services/api";
 
 const SocietyUserForm = () => {
-  const { id } = useParams()
-  const navigate = useNavigate()
-  const isEdit = !!id
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const isEdit = !!id;
+  const isSelfEdit = window.location.pathname.includes("/society-users/edit");
 
-  const [societies, setSocieties] = useState([])
+  const [societies, setSocieties] = useState([]);
   const [formData, setFormData] = useState({
-    society_id: '',
-    email: '',
-    mobile_country_code: '+91',
-    mobile_number: '',
-    password: '',
-    full_name: '',
-    role: 'STAFF',
-    term_start_date: '',
-    term_end_date: '',
+    society_id: "",
+    email: "",
+    mobile_country_code: "+91",
+    mobile_number: "",
+    password: "",
+    full_name: "",
+    role: "STAFF",
+    term_start_date: "",
+    term_end_date: "",
     is_authorized_signatory: false,
-    approval_limit_amount: '',
+    approval_limit_amount: "",
     is_active: true,
-  })
+  });
 
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState(null)
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchSocieties()
-    if (isEdit) {
-      fetchUser()
-    }
-  }, [id])
+    if (!isEdit) fetchSocieties();
+    if (isEdit) fetchUser();
+  }, [id]);
 
   const fetchSocieties = async () => {
     try {
-      const response = await societiesAPI.getAll()
-      setSocieties(response.data.data)
+      const response = await societiesAPI.getAll();
+      setSocieties(response.data.data);
     } catch (err) {
-      console.error('Failed to fetch societies:', err)
+      console.error("Failed to fetch societies:", err);
     }
-  }
+  };
 
   const fetchUser = async () => {
     try {
-      setLoading(true)
-      const response = await societyUsersAPI.getById(id)
-      const user = response.data.data
+      setLoading(true);
+      const response = await societyUsersAPI.getById(id);
+      console.log("API Response for user:", response.data);
+      const user = response.data.data;
       setFormData({
         society_id: user.society_id,
         email: user.email,
-        mobile_country_code: user.mobile_country_code || '+91',
-        mobile_number: user.mobile_number || '',
-        password: '', // Don't populate password
+        mobile_country_code: user.mobile_country_code || "+91",
+        mobile_number: user.mobile_number || "",
+        password: "",
         full_name: user.full_name,
         role: user.role,
-        term_start_date: user.term_start_date ? user.term_start_date.split('T')[0] : '',
-        term_end_date: user.term_end_date ? user.term_end_date.split('T')[0] : '',
+        term_start_date: user.term_start_date
+          ? user.term_start_date.split("T")[0]
+          : "",
+        term_end_date: user.term_end_date
+          ? user.term_end_date.split("T")[0]
+          : "",
         is_authorized_signatory: user.is_authorized_signatory === 1,
-        approval_limit_amount: user.approval_limit_amount || '',
+        approval_limit_amount: user.approval_limit_amount || "",
         is_active: user.is_active === 1,
-      })
+      });
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to fetch user')
+      setError(err.response?.data?.error || "Failed to fetch user");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleChange = (e) => {
-    const { name, value, type, checked } = e.target
+    const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-    }))
-  }
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setLoading(true)
-    setError(null)
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
 
     try {
-      const submitData = { ...formData }
-      // Only include password if it's provided (for updates)
-      if (!submitData.password || submitData.password.trim() === '') {
-        delete submitData.password
+      const submitData = { ...formData };
+      if (!submitData.password || submitData.password.trim() === "") {
+        delete submitData.password;
       }
 
-      // Convert empty strings to null for numeric fields
-      if (!submitData.approval_limit_amount) submitData.approval_limit_amount = null
+      if (!submitData.approval_limit_amount)
+        submitData.approval_limit_amount = null;
 
       if (isEdit) {
-        await societyUsersAPI.update(id, submitData)
+        await societyUsersAPI.update(id, submitData);
       } else {
         if (!submitData.password) {
-          setError('Password is required for new users')
-          setLoading(false)
-          return
+          setError("Password is required for new users");
+          setLoading(false);
+          return;
         }
-        await societyUsersAPI.create(submitData)
+        await societyUsersAPI.create(submitData);
       }
-      navigate('/society-users')
+      navigate("/society-users");
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to save user')
+      setError(err.response?.data?.error || "Failed to save user");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   if (loading && isEdit) {
-    return <div className="loading">Loading user...</div>
+    return <div className="loading">Loading user...</div>;
   }
 
   return (
     <div className="form-container">
-      <h2>{isEdit ? 'Edit Society User' : 'Create New Society User'}</h2>
+      <h2>{isEdit ? "Edit Society User" : "Create New Society User"}</h2>
 
       {error && <div className="error-message">{error}</div>}
 
@@ -186,14 +189,14 @@ const SocietyUserForm = () => {
         </div>
 
         <div className="form-group">
-          <label>Password {!isEdit && '*'}</label>
+          <label>Password {!isEdit && "*"}</label>
           <input
             type="password"
             name="password"
             value={formData.password}
             onChange={handleChange}
             required={!isEdit}
-            placeholder={isEdit ? 'Leave blank to keep current password' : ''}
+            placeholder={isEdit ? "Leave blank to keep current password" : ""}
           />
         </div>
 
@@ -259,8 +262,8 @@ const SocietyUserForm = () => {
                 name="is_authorized_signatory"
                 checked={formData.is_authorized_signatory}
                 onChange={handleChange}
-              />
-              {' '}Authorized Signatory
+              />{" "}
+              Authorized Signatory
             </label>
           </div>
 
@@ -271,31 +274,27 @@ const SocietyUserForm = () => {
                 name="is_active"
                 checked={formData.is_active}
                 onChange={handleChange}
-              />
-              {' '}Active
+              />{" "}
+              Active
             </label>
           </div>
         </div>
 
         <div className="form-actions">
           <button type="submit" className="btn btn-primary" disabled={loading}>
-            {loading ? 'Saving...' : isEdit ? 'Update User' : 'Create User'}
+            {loading ? "Saving..." : isEdit ? "Update User" : "Create User"}
           </button>
           <button
             type="button"
             className="btn btn-secondary"
-            onClick={() => navigate('/society-users')}
+            onClick={() => navigate("/society-users")}
           >
             Cancel
           </button>
         </div>
       </form>
     </div>
-  )
-}
+  );
+};
 
-export default SocietyUserForm
-
-
-
-
+export default SocietyUserForm;
