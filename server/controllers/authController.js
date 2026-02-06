@@ -18,7 +18,7 @@ const login = async (req, res) => {
 
   // Check vendor users
   const [vendorRows] = await pool.query(
-    `SELECT id, password_hash, role, is_first_login
+    `SELECT id, vendor_id, password_hash, role, is_first_login
      FROM vendor_users
      WHERE email = ? AND is_active = 1`,
     [email],
@@ -28,11 +28,11 @@ const login = async (req, res) => {
   const [societyRows] = vendorRows.length
     ? [[]]
     : await pool.query(
-        `SELECT id, password_hash, role, is_first_login
+      `SELECT id, password_hash, role, is_first_login
          FROM society_users
          WHERE email = ? AND is_active = 1`,
         [email],
-      );
+    );
 
   const user = vendorRows[0] || societyRows[0];
   const userType = vendorRows.length ? "vendor" : "society";
@@ -78,7 +78,9 @@ const login = async (req, res) => {
     token,
     firstLogin: false,
     redirectTo:
-      userType === "vendor" ? "/vendor/dashboard" : "/society/dashboard",
+      userType === "vendor"
+        ? `/vendor-dashboard/${user.vendor_id}`
+        : `/society-dashboard/${user.society_id}`,
   });
 };
 
