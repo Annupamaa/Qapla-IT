@@ -66,23 +66,34 @@ class Vendor {
   static async update(id, vendorData) {
     const fields = [];
     const values = [];
-
+  
+    const blocked = ['id', 'created_at', 'updated_at'];
+  
     Object.keys(vendorData).forEach(key => {
-      if (vendorData[key] !== undefined) {
+      if (
+        vendorData[key] !== undefined &&
+        !blocked.includes(key)
+      ) {
         fields.push(`${key} = ?`);
         values.push(vendorData[key]);
       }
     });
-
+  
     if (fields.length === 0) {
       return this.getById(id);
     }
-
+  
+    // force server-side updated_at
+    fields.push('updated_at = NOW()');
+  
     values.push(id);
+  
     const query = `UPDATE vendors SET ${fields.join(', ')} WHERE id = ?`;
     await db.execute(query, values);
+  
     return this.getById(id);
   }
+  
 
   // Delete vendor
   static async delete(id) {
