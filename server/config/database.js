@@ -1,7 +1,7 @@
 const mysql = require("mysql2/promise");
 require("dotenv").config();
 
-const DB_PASSWORD = String("Pass@2428");
+const DB_PASSWORD = String("1Consult!");
 
 const dbConfig = {
   host: process.env.DB_HOST || "127.0.0.1",
@@ -15,7 +15,7 @@ const dbConfig = {
 };
 
 if (!dbConfig.password) {
-  dbConfig.password = "Pass@2428";
+  dbConfig.password = "1Consult!";
 }
 
 dbConfig.password = String(dbConfig.password);
@@ -54,7 +54,7 @@ const poolConfig = {
 
 if (!poolConfig.password || poolConfig.password === "") {
   console.error("CRITICAL: Password missing in poolConfig!");
-  poolConfig.password = "Pass@2428";
+  poolConfig.password = "1Consult!";
 }
 
 console.log(
