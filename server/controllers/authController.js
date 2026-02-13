@@ -16,73 +16,107 @@ const login = async (req, res) => {
       .json({ success: false, message: "Email and password are required" });
   }
 
-  // Check vendor users
-  const [vendorRows] = await pool.query(
-    `SELECT id, password_hash, role, is_first_login
-     FROM vendor_users
-     WHERE email = ? AND is_active = 1`,
-    [email],
-  );
-
-  // Check society users if not vendor
-  const [societyRows] = vendorRows.length
-    ? [[]]
-    : await pool.query(
-        `SELECT id, password_hash, role, is_first_login
-         FROM society_users
-         WHERE email = ? AND is_active = 1`,
-        [email],
-      );
-
-  const user = vendorRows[0] || societyRows[0];
-  const userType = vendorRows.length ? "vendor" : "society";
-
-  if (!user) {
-    return res
-      .status(401)
-      .json({ success: false, message: "Invalid email or password" });
-  }
-
-  // Password check
-  const isMatch = await bcrypt.compare(password, user.password_hash);
-  if (!isMatch) {
-    return res
-      .status(401)
-      .json({ success: false, message: "Invalid email or password" });
-  }
-
-  // First login → temporary token for password change
-  if (user.is_first_login) {
-    const tempToken = jwt.sign(
-      { id: user.id, role: user.role, type: userType },
-      JWT_SECRET,
-      { expiresIn: "15m" },
+  try {
+    // ✅ Check vendor users first
+    const [vendorRows] = await pool.query(
+      `SELECT id, password_hash, role, is_first_login
+       FROM vendor_users
+       WHERE email = ? AND is_active = 1`,
+      [email]
     );
 
+    // ✅ If not vendor → check society
+    const [societyRows] = vendorRows.length
+      ? [[]]
+      : await pool.query(
+          `SELECT id, password_hash, role, is_first_login
+           FROM society_users
+           WHERE email = ? AND is_active = 1`,
+          [email]
+        );
+
+    const user = vendorRows[0] || societyRows[0];
+    const userType = vendorRows.length ? "vendor" : "society";
+
+    if (!user) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid email or password" });
+    }
+
+    // ✅ Password check
+    const isMatch = await bcrypt.compare(password, user.password_hash);
+    if (!isMatch) {
+      return res
+        .status(401)
+        .json({ success: false, message: "Invalid email or password" });
+    }
+
+    // ✅ First login → force password change
+    if (user.is_first_login) {
+      const tempToken = jwt.sign(
+        { id: user.id, role: user.role, type: userType },
+        JWT_SECRET,
+        { expiresIn: "15m" }
+      );
+
+      return res.json({
+        success: true,
+        firstLogin: true,
+        token: tempToken,
+      });
+    }
+
+    // ✅ Create token
+    const token = jwt.sign(
+      { id: user.id, role: user.role, type: userType },
+      JWT_SECRET,
+      { expiresIn: "1d" }
+    );
+
+    // ⭐⭐⭐ THIS IS THE IMPORTANT PART ⭐⭐⭐
+    let redirectTo = "/";
+
+// ⭐ Admin & CRM first
+if (user.role === "admin") {
+  redirectTo = "/admin";
+
+} else if (user.role === "crm_vendor") {
+  redirectTo = "/crm-vendor";
+
+} else if (user.role === "crm_society") {
+  redirectTo = "/crm-society";
+
+}
+
+// ⭐ Now decide dashboard from TABLE (userType)
+else if (userType === "vendor") {
+  redirectTo = "/vendor/dashboard";
+
+} else if (userType === "society") {
+  redirectTo = "/society/dashboard";
+}
+
+
+    // ✅ Send response
     return res.json({
       success: true,
-      firstLogin: true,
-      token: tempToken,
+      token,
+      firstLogin: false,
+      role: user.role,
+      userType,
+      redirectTo,
+    });
+
+  } catch (error) {
+    console.error("LOGIN ERROR:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Server error",
     });
   }
-
-  // Normal login → go to dashboard
-  const token = jwt.sign(
-    { id: user.id, role: user.role, type: userType },
-    JWT_SECRET,
-    { expiresIn: "1d" },
-  );
-
-  return res.json({
-    success: true,
-    token,
-    firstLogin: false,
-    role: user.role,
-    userType,
-    redirectTo:
-      userType === "vendor" ? "/vendor/dashboard" : "/society/dashboard",
-  });
 };
+
 
 /**
  * CHANGE PASSWORD

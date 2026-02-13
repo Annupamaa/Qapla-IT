@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const SocietyUserProfile = () => {
+const VendorUserProfile = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -17,7 +17,7 @@ const SocietyUserProfile = () => {
       setLoading(true);
 
       const res = await axios.get(
-        "http://localhost:5001/api/society/me",
+        "http://localhost:5001/api/vendor-users/me",
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -43,11 +43,11 @@ const SocietyUserProfile = () => {
   return (
     <div className="table-container">
       <div className="table-header">
-        <h2>Society User Profile</h2>
+        <h2>Vendor User Profile</h2>
 
         <button
           className="btn btn-primary"
-          onClick={() => navigate(`/society-users/edit/${user.id}`)}
+          onClick={() => navigate(`/vendor-users/edit/${user.id}`)}
         >
           Edit Profile
         </button>
@@ -92,4 +92,4 @@ const SocietyUserProfile = () => {
   );
 };
 
-export default SocietyUserProfile;
+export default VendorUserProfile;

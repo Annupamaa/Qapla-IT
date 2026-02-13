@@ -19,6 +19,10 @@ import Login from "./components/Login/Login";
 import ChangePassword from "./components/Login/ChangePassword";
 import ForgetPassword from "./components/Login/ForgetPassword";
 import SocietyUserProfile from "./components/dashboard/SocietyUserProfile";
+import VendorUserProfile from "./components/dashboard/VendorUserProfile";
+import Admin from "./components/dashboard/Admin";
+import CrmVendor from "./components/dashboard/CrmVendor";
+import CrmSociety from "./components/dashboard/CrmSociety";
 
 import "./App.css";
 
@@ -116,6 +120,12 @@ function App() {
             <Route path="/society-users" element={<SocietyUserList />} />
             <Route path="/society-users/new" element={<SocietyUserForm />} />
             <Route path="/society/dashboard" element={<SocietyUserProfile />} />
+            <Route path="/vendor/dashboard" element={<VendorUserProfile />} />
+
+            <Route path="/admin" element={<Admin />} />
+
+            <Route path="/crm-vendor" element={<CrmVendor />} />
+            <Route path="/crm-society" element={<CrmSociety />} />
             <Route
               path="/society-users/edit/:id"
               element={<SocietyUserForm />}

@@ -1,4 +1,40 @@
 const VendorUser = require('../models/VendorUser');
+const pool = require("../config/database");
+
+exports.getMyProfile = async (req, res) => {
+  try {
+
+    const userId = req.user.id;
+
+    const [rows] = await pool.query(
+      `SELECT id, email, role
+       FROM vendor_users
+       WHERE id = ? AND is_active = 1`,
+      [userId]
+    );
+
+    if (!rows.length) {
+      return res.status(404).json({
+        success: false,
+        message: "Vendor user not found",
+      });
+    }
+
+    res.json({
+      success: true,
+      data: rows[0],
+    });
+
+  } catch (error) {
+
+    console.error("GET MY PROFILE ERROR:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
+  }
+};
 
 // Get all vendor users
 exports.getAllVendorUsers = async (req, res) => {
