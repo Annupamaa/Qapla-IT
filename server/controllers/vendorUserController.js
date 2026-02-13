@@ -80,6 +80,24 @@ exports.updateVendorUser = async (req, res) => {
   }
 };
 
+exports.getMyProfile = async (req, res) => {
+  try {
+    const user = await VendorUser.getById(req.user.id);
+    res.json({ success: true, data: user });
+  } catch (err) {
+    res.status(500).json({ success:false, error: err.message });
+  }
+};
+
+exports.updateMyProfile = async (req, res) => {
+  try {
+    const user = await VendorUser.update(req.user.id, req.body);
+    res.json({ success: true, data: user });
+  } catch (err) {
+    res.status(400).json({ success:false, error: err.message });
+  }
+};
+
 // Delete vendor user
 exports.deleteVendorUser = async (req, res) => {
   try {

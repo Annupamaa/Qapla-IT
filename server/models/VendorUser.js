@@ -77,6 +77,11 @@ class VendorUser {
     return this.getById(id);
   }
 
+  static async countAll() {
+    const [rows] = await db.query(`SELECT COUNT(*) as count FROM vendor_users`);
+    return rows[0].count;
+  }
+
   // Delete vendor user
   static async delete(id) {
     const [result] = await db.execute('DELETE FROM vendor_users WHERE id = ?', [id]);

@@ -19,6 +19,20 @@ router.get(
     societyController.getSocietyById
 );
 
+router.get(
+    "/profile",
+    authMiddleware,
+    allowRoles("VENDOR_USER"),
+    societyController.getMySociety
+);
+
+router.put(
+    "/profile",
+    authMiddleware,
+    allowRoles("VENDOR_USER"),
+    societyController.updateMySociety
+);
+
 router.post(
     '/',
     authMiddleware,

@@ -98,6 +98,17 @@ exports.updateSocietyUser = async (req, res) => {
   }
 };
 
+exports.getMyProfile = async (req,res)=>{
+  const user = await SocietyUser.getById(req.user.id);
+  res.json({success:true,data:user});
+};
+
+exports.updateMyProfile = async (req,res)=>{
+  const user = await SocietyUser.update(req.user.id, req.body);
+  res.json({success:true,data:user});
+};
+
+
 // Delete society user
 exports.deleteSocietyUser = async (req, res) => {
   try {

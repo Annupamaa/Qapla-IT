@@ -19,6 +19,20 @@ router.get(
     vendorController.getVendorById
 );
 
+router.get(
+    "/profile",
+    authMiddleware,
+    allowRoles("VENDOR_USER"),
+    vendorController.getMyVendor
+);
+
+router.put(
+    "/profile",
+    authMiddleware,
+    allowRoles("VENDOR_USER"),
+    vendorController.updateMyVendor
+);
+
 router.post(
     '/',
     authMiddleware,

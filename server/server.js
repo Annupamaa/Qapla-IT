@@ -7,6 +7,8 @@ const vendorUserRoutes = require('./routes/vendorUserRoutes');
 const societyRoutes = require('./routes/societyRoutes');
 const societyUserRoutes = require('./routes/societyUserRoutes');
 const authRoutes = require('./routes/authRoutes');
+const adminDashboardRoutes = require('./routes/adminDashboardRoutes');
+const crmDashboardRoutes = require('./routes/crmDashboardRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -22,6 +24,8 @@ app.use('/api/vendor-users', vendorUserRoutes);
 app.use('/api/societies', societyRoutes);
 app.use('/api/society-users', societyUserRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/admin', adminDashboardRoutes);
+app.use('/api/crm', crmDashboardRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

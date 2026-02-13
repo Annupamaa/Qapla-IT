@@ -19,6 +19,13 @@ router.get(
     vendorUserController.getVendorUserById
 );
 
+router.get(
+    "/profile",
+    authMiddleware,
+    allowRoles("VENDOR_USER"),
+    vendorUserController.getMyProfile
+);
+
 router.post(
     '/',
     authMiddleware,
@@ -31,6 +38,13 @@ router.put(
     authMiddleware,
     allowRoles("ADMIN", "CRM_VENDOR", "VENDOR_USER"),
     vendorUserController.updateVendorUser
+);
+
+router.put(
+    "/profile",
+    authMiddleware,
+    allowRoles("VENDOR_USER"),
+    vendorUserController.updateMyProfile
 );
 
 router.delete(

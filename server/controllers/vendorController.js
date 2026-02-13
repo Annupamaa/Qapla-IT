@@ -89,6 +89,16 @@ exports.updateVendor = async (req, res) => {
   }
 };
 
+exports.getMyVendor = async (req,res)=>{
+  const vendor = await Vendor.getById(req.user.vendorId);
+  res.json({success:true,data:vendor});
+};
+
+exports.updateMyVendor = async (req,res)=>{
+  const vendor = await Vendor.update(req.user.vendorId, req.body);
+  res.json({success:true,data:vendor});
+};
+
 
 // Delete vendor
 exports.deleteVendor = async (req, res) => {

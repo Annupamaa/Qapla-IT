@@ -93,7 +93,11 @@ class Vendor {
   
     return this.getById(id);
   }
-  
+
+  static async countAll() {
+    const [rows] = await db.query(`SELECT COUNT(*) as count FROM vendors`);
+    return rows[0].count;
+  }
 
   // Delete vendor
   static async delete(id) {

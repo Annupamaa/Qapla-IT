@@ -15,7 +15,7 @@ exports.getSocietyById = async (req, res) => {
   try {
     const id = Number(req.params.id);
 
-    // 🔒 ownership check
+    //  ownership check
     if (
       req.user.systemRole === "SOCIETY_USER" &&
       req.user.societyId !== id
@@ -61,7 +61,7 @@ exports.updateSociety = async (req, res) => {
   try {
     const id = Number(req.params.id);
 
-    // 🔒 ownership check
+    //  ownership check
     if (
       req.user.systemRole === "SOCIETY_USER" &&
       req.user.societyId !== id
@@ -91,6 +91,15 @@ exports.updateSociety = async (req, res) => {
   }
 };
 
+exports.getMySociety = async (req,res)=>{
+  const society = await Society.getById(req.user.societyId);
+  res.json({success:true,data:society});
+};
+
+exports.updateMySociety = async (req,res)=>{
+  const society = await Society.update(req.user.societyId, req.body);
+  res.json({success:true,data:society});
+};
 
 // Delete society
 exports.deleteSociety = async (req, res) => {
