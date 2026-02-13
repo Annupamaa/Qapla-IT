@@ -185,3 +185,22 @@ CREATE TABLE society_users (
 
     UNIQUE KEY uq_society_users_society_email (society_id, email)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- =====================================================================
+-- SYSTEM USERS(ADMIN, CRM_VENDOR, CRM_SOCIETY)
+-- =====================================================================
+CREATE TABLE system_users (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(150) UNIQUE NOT NULL,
+    password_hash VARCHAR(255) NOT NULL,
+    full_name VARCHAR(150) NOT NULL,
+
+    role ENUM('ADMIN','CRM_VENDOR','CRM_SOCIETY') NOT NULL,
+
+    is_active TINYINT(1) DEFAULT 1,
+    is_first_login TINYINT(1) DEFAULT 1,
+
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP
+);
