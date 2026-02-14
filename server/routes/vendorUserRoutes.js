@@ -1,6 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const vendorUserController = require('../controllers/vendorUserController');
+const authMiddleware = require('../middleware/authMiddleware');
+
+router.get('/me', authMiddleware, vendorUserController.getMyProfile);
+
 
 const authMiddleware = require('../middleware/authMiddleware');
 const allowRoles = require('../middleware/allowRoles');
