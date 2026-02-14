@@ -76,6 +76,11 @@ class Society {
     return this.getById(id);
   }
 
+  static async countAll() {
+    const [rows] = await db.query(`SELECT COUNT(*) as count FROM societies`);
+    return rows[0].count;
+  }
+
   // Delete society
   static async delete(id) {
     const [result] = await db.execute('DELETE FROM societies WHERE id = ?', [id]);

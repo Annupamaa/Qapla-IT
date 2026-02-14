@@ -111,6 +111,7 @@ function App() {
 
             <Route path="/vendor-users" element={<VendorUserList />} />
             <Route path="/vendor-users/new" element={<VendorUserForm />} />
+            <Route path="/vendor-dashboard/:vendorId" element={<VendorDashboard />} />
             <Route path="/vendor-users/edit/:id" element={<VendorUserForm />} />
 
             <Route path="/societies" element={<SocietyList />} />

@@ -13,15 +13,37 @@ exports.getAllVendors = async (req, res) => {
 // Get vendor by ID
 exports.getVendorById = async (req, res) => {
   try {
-    const vendor = await Vendor.getById(req.params.id);
-    if (!vendor) {
-      return res.status(404).json({ success: false, error: 'Vendor not found' });
+    const id = Number(req.params.id);
+
+    if (
+      req.user.systemRole === "VENDOR_USER" &&
+      req.user.vendorId !== id
+    ) {
+      return res.status(403).json({
+        success:false,
+        message:"You can only view your own vendor"
+      });
     }
-    res.json({ success: true, data: vendor });
+
+    const vendor = await Vendor.getById(id);
+
+    if (!vendor) {
+      return res.status(404).json({
+        success:false,
+        error:'Vendor not found'
+      });
+    }
+
+    res.json({ success:true, data:vendor });
+
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({
+      success:false,
+      error:error.message
+    });
   }
 };
+
 
 // Create vendor
 exports.createVendor = async (req, res) => {
@@ -36,15 +58,47 @@ exports.createVendor = async (req, res) => {
 // Update vendor
 exports.updateVendor = async (req, res) => {
   try {
-    const vendor = await Vendor.update(req.params.id, req.body);
-    if (!vendor) {
-      return res.status(404).json({ success: false, error: 'Vendor not found' });
+    const id = Number(req.params.id);
+
+    if (
+      req.user.systemRole === "VENDOR_USER" &&
+      req.user.vendorId !== id
+    ) {
+      return res.status(403).json({
+        success:false,
+        message:"You can update only your own vendor"
+      });
     }
-    res.json({ success: true, data: vendor });
+
+    const vendor = await Vendor.update(id, req.body);
+
+    if (!vendor) {
+      return res.status(404).json({
+        success:false,
+        error:'Vendor not found'
+      });
+    }
+
+    res.json({ success:true, data:vendor });
+
   } catch (error) {
-    res.status(400).json({ success: false, error: error.message });
+    res.status(400).json({
+      success:false,
+      error:error.message
+    });
   }
 };
+
+exports.getMyVendor = async (req,res)=>{
+  const vendor = await Vendor.getById(req.user.vendorId);
+  res.json({success:true,data:vendor});
+};
+
+exports.updateMyVendor = async (req,res)=>{
+  const vendor = await Vendor.update(req.user.vendorId, req.body);
+  res.json({success:true,data:vendor});
+};
+
 
 // Delete vendor
 exports.deleteVendor = async (req, res) => {
@@ -58,7 +112,3 @@ exports.deleteVendor = async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 };
-
-
-
-

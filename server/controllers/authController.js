@@ -4,17 +4,24 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 const JWT_SECRET = process.env.JWT_SECRET;
 
-/**
- * LOGIN
- */
+//----Login----
 const login = async (req, res) => {
-  const { email, password } = req.body;
+  try {
+    const { email, password } = req.body;
 
-  if (!email || !password) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Email and password are required" });
-  }
+    if (!email || !password) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Email and password are required" });
+    }
+
+    // Check system users (ADMIN / CRM)
+    const [systemRows] = await pool.query(
+      `SELECT id, password_hash, role, is_first_login
+       FROM system_users
+       WHERE email = ? AND is_active = 1`,
+      [email]
+    );
 
   try {
     // ✅ Check vendor users first
@@ -124,37 +131,81 @@ else if (userType === "vendor") {
 const changePassword = async (req, res) => {
   const { newPassword } = req.body;
 
-  const decoded = req.user;
+    if (userType === "society")
+      redirectTo = `/society-dashboard/${user.society_id}`;
 
-  if (!newPassword || newPassword.length < 6) {
-    return res.status(400).json({
-      success: false,
-      message: "Password must be at least 6 characters",
+    return res.json({
+      success: true,
+      token,
+      firstLogin: false,
+      systemRole,
+      subRole,
+      redirectTo
     });
+  } catch (err) {
+    console.error("LOGIN ERROR:", err);
+    res.status(500).json({ success: false, message: "Server error" });
   }
+};
 
-  const hashedPassword = await bcrypt.hash(newPassword, 10);
+//-----Change Password------
+const changePassword = async (req, res) => {
+  try {
+    const { newPassword } = req.body;
 
-  let query;
-  if (decoded.type === "vendor") {
-    query = `UPDATE vendor_users SET password_hash = ?, is_first_login = 0 WHERE id = ?`;
-  } else {
-    query = `UPDATE society_users SET password_hash = ?, is_first_login = 0 WHERE id = ?`;
-  }
+    const decoded = req.user;
 
-  const [result] = await pool.query(query, [hashedPassword, decoded.id]);
+    if (!newPassword || newPassword.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must be at least 6 characters",
+      });
+    }
 
-  if (!result.affectedRows) {
-    return res.status(400).json({
-      success: false,
-      message: "Password update failed",
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    let query;
+
+    if (decoded.type === "system") {
+      query = `UPDATE system_users 
+             SET password_hash = ?, is_first_login = 0 
+             WHERE id = ?`;
+    }
+    else if (decoded.type === "vendor") {
+      query = `UPDATE vendor_users 
+             SET password_hash = ?, is_first_login = 0 
+             WHERE id = ?`;
+    }
+    else if (decoded.type === "society") {
+      query = `UPDATE society_users 
+             SET password_hash = ?, is_first_login = 0 
+             WHERE id = ?`;
+    }
+
+    if (!query) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid user type"
+      });
+    }
+
+    const [result] = await pool.query(query, [hashedPassword, decoded.id]);
+
+    if (!result.affectedRows) {
+      return res.status(400).json({
+        success: false,
+        message: "Password update failed",
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Password updated successfully",
     });
+  } catch (err) {
+    console.error("CHANGE PASSWORD ERROR:", err);
+    res.status(500).json({ success: false, message: "Server error" });
   }
-
-  res.json({
-    success: true,
-    message: "Password updated successfully",
-  });
 };
 
 module.exports = { login, changePassword };

@@ -9,14 +9,14 @@ function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setError("");
+    const handleLogin = async (e) => {
+        e.preventDefault();
+        setError("");
 
-    if (!username || !password) {
-      setError("All fields are required");
-      return;
-    }
+        if (!username || !password) {
+            setError("All fields are required");
+            return;
+        }
 
     try {
       setLoading(true);
@@ -32,7 +32,7 @@ function Login() {
         }),
       });
 
-      const response = await res.json();
+            const response = await res.json();
 
       console.log("LOGIN RESPONSE 👉", response); // ⭐ DEBUG
 
@@ -94,33 +94,33 @@ function Login() {
     }
   };
 
-  return (
-    <div className="pg-login-page">
-      <div className="pg-login-box">
-        <h2 className="pg-login-title">Login</h2>
+    return (
+        <div className="pg-login-page">
+            <div className="pg-login-box">
+                <h2 className="pg-login-title">Login</h2>
 
-        {error && <div className="pg-login-error">{error}</div>}
+                {error && <div className="pg-login-error">{error}</div>}
 
-        <form onSubmit={handleLogin}>
-          <div className="pg-form-group">
-            <label className="pg-form-label">Username / Email</label>
-            <input
-              type="text"
-              className="pg-form-input"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            />
-          </div>
+                <form onSubmit={handleLogin}>
+                    <div className="pg-form-group">
+                        <label className="pg-form-label">Username / Email</label>
+                        <input
+                            type="text"
+                            className="pg-form-input"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                        />
+                    </div>
 
-          <div className="pg-form-group">
-            <label className="pg-form-label">Password</label>
-            <input
-              type="password"
-              className="pg-form-input"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </div>
+                    <div className="pg-form-group">
+                        <label className="pg-form-label">Password</label>
+                        <input
+                            type="password"
+                            className="pg-form-input"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
+                    </div>
 
           <button 
             type="submit" 
@@ -129,6 +129,14 @@ function Login() {
           >
             {loading ? "Logging in..." : "Login"}
           </button>
+
+           <button
+              type="button"
+              className="forget-password"
+              onClick={() => navigate("/forgot-password")}
+              >
+                Forget Password?
+            </button>
         </form>
       </div>
     </div>
