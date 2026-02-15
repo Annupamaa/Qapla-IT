@@ -4,7 +4,10 @@ import {
   Route,
   NavLink,
   useLocation,
+  useNavigate,     
 } from "react-router-dom";
+
+import axios from "axios"; 
 
 import VendorList from "./components/vendors/VendorList";
 import VendorForm from "./components/vendors/VendorForm";
@@ -30,13 +33,21 @@ import "./App.css";
 
 function AppLayout({ children }) {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const isAuthPage =
     location.pathname === "/login" ||
     location.pathname === "/change-password" ||
     location.pathname === "/forgot-password";
 
-  return <>{!isAuthPage && children}</>;
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    delete axios.defaults.headers.common["Authorization"];
+    navigate("/login");
+  };
+
+  return <>{!isAuthPage && children(handleLogout)}</>;
 }
 
 function App() {
@@ -44,57 +55,70 @@ function App() {
     <Router>
       <div className="App">
         <AppLayout>
-          <header className="header">
-            <h1>PartnerGrid</h1>
-            <p style={{ textAlign: "center", marginTop: "10px", opacity: 0.9 }}>
-              Vendor & Society Onboarding System
-            </p>
-          </header>
+          {(handleLogout) => ( 
+            <>
+              <header className="header">
+                <h1>PartnerGrid</h1>
+                <p style={{ textAlign: "center", marginTop: "10px", opacity: 0.9 }}>
+                  Vendor & Society Onboarding System
+                </p>
+              </header>
 
-          <nav className="nav">
-            <ul>
-              <li>
-                <NavLink
-                  to="/vendors/register"
-                  className={({ isActive }) => (isActive ? "active" : "")}
-                >
-                  Register Vendor
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to="/vendors"
-                  className={({ isActive }) => (isActive ? "active" : "")}
-                >
-                  Vendors
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to="/vendor-users"
-                  className={({ isActive }) => (isActive ? "active" : "")}
-                >
-                  Vendor Users
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to="/societies"
-                  className={({ isActive }) => (isActive ? "active" : "")}
-                >
-                  Societies
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to="/society-users"
-                  className={({ isActive }) => (isActive ? "active" : "")}
-                >
-                  Society Users
-                </NavLink>
-              </li>
-            </ul>
-          </nav>
+              <nav className="nav">
+                <ul>
+                  <li>
+                    <NavLink
+                      to="/vendors/register"
+                      className={({ isActive }) => (isActive ? "active" : "")}
+                    >
+                      Register Vendor
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink
+                      to="/vendors"
+                      className={({ isActive }) => (isActive ? "active" : "")}
+                    >
+                      Vendors
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink
+                      to="/vendor-users"
+                      className={({ isActive }) => (isActive ? "active" : "")}
+                    >
+                      Vendor Users
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink
+                      to="/societies"
+                      className={({ isActive }) => (isActive ? "active" : "")}
+                    >
+                      Societies
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink
+                      to="/society-users"
+                      className={({ isActive }) => (isActive ? "active" : "")}
+                    >
+                      Society Users
+                    </NavLink>
+                  </li>
+                  <li>
+                    <button
+                      onClick={handleLogout}
+                      className="nav-logout-btn"
+                    >
+                      Logout
+                    </button>
+                  </li>
+
+                </ul>
+              </nav>
+            </>
+          )}
         </AppLayout>
 
         <div className="container">
@@ -127,9 +151,9 @@ function App() {
             <Route path="/vendor/dashboard" element={<VendorUserProfile />} />
 
             <Route path="/admin-dashboard" element={<Admin />} />
-
             <Route path="/crm-vendor-dashboard" element={<CrmVendor />} />
             <Route path="/crm-society-dashboard" element={<CrmSociety />} />
+
             <Route
               path="/society-users/edit/:id"
               element={<SocietyUserForm />}
