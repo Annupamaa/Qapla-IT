@@ -8,7 +8,7 @@ const allowRoles = require('../middleware/allowRoles');
 router.get(
     '/',
     authMiddleware,
-    allowRoles("ADMIN", "CRM_SOCIETY"),
+    allowRoles("ADMIN", "CRM_SOCIETY", "SOCIETY_USER"),
     societyController.getAllSocieties
 );
 
@@ -22,14 +22,14 @@ router.get(
 router.get(
     "/profile",
     authMiddleware,
-    allowRoles("VENDOR_USER"),
+    allowRoles("SOCIETY_USER"),
     societyController.getMySociety
 );
 
 router.put(
     "/profile",
     authMiddleware,
-    allowRoles("VENDOR_USER"),
+    allowRoles("SOCIETY_USER"),
     societyController.updateMySociety
 );
 

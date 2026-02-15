@@ -23,6 +23,8 @@ import VendorUserProfile from "./components/dashboard/VendorUserProfile";
 import Admin from "./components/dashboard/Admin";
 import CrmVendor from "./components/dashboard/CrmVendor";
 import CrmSociety from "./components/dashboard/CrmSociety";
+import VendorDashboard from "./components/vendorUsers/VendorDashboard";
+import SocietyDashboard from "./components/societyUsers/SocietyDashboard";
 
 import "./App.css";
 
@@ -116,6 +118,7 @@ function App() {
 
             <Route path="/societies" element={<SocietyList />} />
             <Route path="/societies/new" element={<SocietyForm />} />
+            <Route path="/society-dashboard/:societyId" element={<SocietyDashboard />} />
             <Route path="/societies/edit/:id" element={<SocietyForm />} />
 
             <Route path="/society-users" element={<SocietyUserList />} />
@@ -123,10 +126,10 @@ function App() {
             <Route path="/society/dashboard" element={<SocietyUserProfile />} />
             <Route path="/vendor/dashboard" element={<VendorUserProfile />} />
 
-            <Route path="/admin" element={<Admin />} />
+            <Route path="/admin-dashboard" element={<Admin />} />
 
-            <Route path="/crm-vendor" element={<CrmVendor />} />
-            <Route path="/crm-society" element={<CrmSociety />} />
+            <Route path="/crm-vendor-dashboard" element={<CrmVendor />} />
+            <Route path="/crm-society-dashboard" element={<CrmSociety />} />
             <Route
               path="/society-users/edit/:id"
               element={<SocietyUserForm />}

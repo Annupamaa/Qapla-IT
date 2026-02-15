@@ -9,6 +9,20 @@ const api = axios.create({
   },
 })
 
+/* ADD — JWT TOKEN AUTO ATTACH */
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem("token")
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
+    return config
+  },
+  (error) => Promise.reject(error)
+)
+//  END ADD 
+
+
 // Vendors API
 export const vendorsAPI = {
   getAll: () => api.get('/vendors'),
@@ -52,7 +66,3 @@ export const societyUsersAPI = {
 }
 
 export default api
-
-
-
-

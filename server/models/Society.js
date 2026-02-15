@@ -49,18 +49,25 @@ class Society {
     return this.getById(result.insertId);
   }
 
-  // Update society
+  // Update society  ✅ FIXED LIKE VENDOR
   static async update(id, societyData) {
     const fields = [];
     const values = [];
 
+    const blocked = ['id', 'created_at', 'updated_at'];
+
     // Handle JSON fields
     if (societyData.emergency_approval_rules_json) {
-      societyData.emergency_approval_rules_json = JSON.stringify(societyData.emergency_approval_rules_json);
+      societyData.emergency_approval_rules_json = JSON.stringify(
+        societyData.emergency_approval_rules_json
+      );
     }
 
     Object.keys(societyData).forEach(key => {
-      if (societyData[key] !== undefined) {
+      if (
+        societyData[key] !== undefined &&
+        !blocked.includes(key)
+      ) {
         fields.push(`${key} = ?`);
         values.push(societyData[key]);
       }
@@ -70,9 +77,14 @@ class Society {
       return this.getById(id);
     }
 
+    // ✅ force server-side timestamp
+    fields.push('updated_at = NOW()');
+
     values.push(id);
+
     const query = `UPDATE societies SET ${fields.join(', ')} WHERE id = ?`;
     await db.execute(query, values);
+
     return this.getById(id);
   }
 
@@ -89,7 +101,3 @@ class Society {
 }
 
 module.exports = Society;
-
-
-
-

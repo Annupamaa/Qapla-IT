@@ -44,13 +44,13 @@ const Admin = () => {
         </button>
 
         <button className="btn btn-success"
-          onClick={() => navigate("/crm-vendor")}
+          onClick={() => navigate("/crm-vendor-dashboard")}
         >
           CRM Vendor Dashboard
         </button>
 
         <button className="btn btn-success"
-          onClick={() => navigate("/crm-society")}
+          onClick={() => navigate("/crm-society-dashboard")}
         >
           CRM Society Dashboard
         </button>

@@ -69,13 +69,13 @@ function Login() {
           redirectPath = "/society/dashboard";
         } 
         else if (response.role === "admin") {
-          redirectPath = "/admin";
+          redirectPath = "/admin-dashboard";
         } 
         else if (response.role === "crm_vendor") {
-          redirectPath = "/crm-vendor";
+          redirectPath = "/crm-vendor-dashboard";
         } 
         else if (response.role === "crm_society") {
-          redirectPath = "/crm-society";
+          redirectPath = "/crm-society-dashboard";
         } 
         else {
           redirectPath = "/";

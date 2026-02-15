@@ -2,12 +2,9 @@ const express = require('express');
 const router = express.Router();
 const vendorUserController = require('../controllers/vendorUserController');
 const authMiddleware = require('../middleware/authMiddleware');
+const allowRoles = require('../middleware/allowRoles');
 
 router.get('/me', authMiddleware, vendorUserController.getMyProfile);
-
-
-const authMiddleware = require('../middleware/authMiddleware');
-const allowRoles = require('../middleware/allowRoles');
 
 router.get(
     '/',

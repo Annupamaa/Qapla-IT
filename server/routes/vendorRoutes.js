@@ -8,7 +8,7 @@ const allowRoles = require('../middleware/allowRoles');
 router.get(
     '/',
     authMiddleware,
-    allowRoles("ADMIN", "CRM_VENDOR"),
+    allowRoles("ADMIN", "CRM_VENDOR", "VENDOR_USER"),
     vendorController.getAllVendors
 );
 

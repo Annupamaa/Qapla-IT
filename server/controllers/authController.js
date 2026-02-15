@@ -23,27 +23,37 @@ const login = async (req, res) => {
       [email]
     );
 
-  try {
-    // ✅ Check vendor users first
+    // Check vendor users
     const [vendorRows] = await pool.query(
-      `SELECT id, password_hash, role, is_first_login
-       FROM vendor_users
-       WHERE email = ? AND is_active = 1`,
+      `SELECT id, vendor_id, password_hash, role, is_first_login
+     FROM vendor_users
+     WHERE email = ? AND is_active = 1`,
+      [email],
+    );
+
+    // Check society users if not vendor
+    const [societyRows] = await pool.query(
+      `SELECT id, society_id, password_hash, role, is_first_login
+     FROM society_users
+     WHERE email = ? AND is_active = 1`,
       [email]
     );
 
-    // ✅ If not vendor → check society
-    const [societyRows] = vendorRows.length
-      ? [[]]
-      : await pool.query(
-          `SELECT id, password_hash, role, is_first_login
-           FROM society_users
-           WHERE email = ? AND is_active = 1`,
-          [email]
-        );
 
-    const user = vendorRows[0] || societyRows[0];
-    const userType = vendorRows.length ? "vendor" : "society";
+    // ----- detect user -----
+    let user = null;
+    let userType = null;
+
+    if (systemRows.length) {
+      user = systemRows[0];
+      userType = "system";
+    } else if (vendorRows.length) {
+      user = vendorRows[0];
+      userType = "vendor";
+    } else if (societyRows.length) {
+      user = societyRows[0];
+      userType = "society";
+    }
 
     if (!user) {
       return res
@@ -51,7 +61,7 @@ const login = async (req, res) => {
         .json({ success: false, message: "Invalid email or password" });
     }
 
-    // ✅ Password check
+    // Password check
     const isMatch = await bcrypt.compare(password, user.password_hash);
     if (!isMatch) {
       return res
@@ -59,10 +69,18 @@ const login = async (req, res) => {
         .json({ success: false, message: "Invalid email or password" });
     }
 
-    // ✅ First login → force password change
+    // ----- roles -----
+    let systemRole = null;
+    let subRole = user.role ? user.role.toUpperCase() : null;   // ⭐ FIX
+
+    if (userType === "system") systemRole = user.role ? user.role.toUpperCase() : null; // ⭐ FIX
+    if (userType === "vendor") systemRole = "VENDOR_USER";
+    if (userType === "society") systemRole = "SOCIETY_USER";
+
+    // First login → temporary token for password change
     if (user.is_first_login) {
       const tempToken = jwt.sign(
-        { id: user.id, role: user.role, type: userType },
+        { id: user.id, systemRole, subRole, type: userType },
         JWT_SECRET,
         { expiresIn: "15m" }
       );
@@ -70,67 +88,33 @@ const login = async (req, res) => {
       return res.json({
         success: true,
         firstLogin: true,
-        token: tempToken,
+        token: tempToken
       });
     }
 
-    // ✅ Create token
+    // Normal login → go to dashboard
     const token = jwt.sign(
-      { id: user.id, role: user.role, type: userType },
+      {
+        id: user.id,
+        systemRole,
+        subRole,
+        type: userType,
+        vendorId: user.vendor_id || null,
+        societyId: user.society_id || null
+      },
       JWT_SECRET,
-      { expiresIn: "1d" }
+      { expiresIn: "30m" }
     );
 
-    // ⭐⭐⭐ THIS IS THE IMPORTANT PART ⭐⭐⭐
     let redirectTo = "/";
 
-// ⭐ Admin & CRM first
-if (user.role === "admin") {
-  redirectTo = "/admin";
+    if (systemRole === "ADMIN") redirectTo = "/admin-dashboard";
+    if (systemRole === "CRM_VENDOR") redirectTo = "/crm-vendor-dashboard";
+    if (systemRole === "CRM_SOCIETY") redirectTo = "/crm-society-dashboard";
 
-} else if (user.role === "crm_vendor") {
-  redirectTo = "/crm-vendor";
-
-} else if (user.role === "crm_society") {
-  redirectTo = "/crm-society";
-
-}
-
-// ⭐ Now decide dashboard from TABLE (userType)
-else if (userType === "vendor") {
-  redirectTo = "/vendor/dashboard";
-
-} else if (userType === "society") {
-  redirectTo = "/society/dashboard";
-}
-
-
-    // ✅ Send response
-    return res.json({
-      success: true,
-      token,
-      firstLogin: false,
-      role: user.role,
-      userType,
-      redirectTo,
-    });
-
-  } catch (error) {
-    console.error("LOGIN ERROR:", error);
-    return res.status(500).json({
-      success: false,
-      message: "Server error",
-    });
-  }
-};
-
-
-/**
- * CHANGE PASSWORD
- */
-const changePassword = async (req, res) => {
-  const { newPassword } = req.body;
-
+    if (userType === "vendor")
+      redirectTo = `/vendor-dashboard/${user.vendor_id}`;
+    crm-vendor-dashboard
     if (userType === "society")
       redirectTo = `/society-dashboard/${user.society_id}`;
 
