@@ -71,9 +71,9 @@ const login = async (req, res) => {
 
     // ----- roles -----
     let systemRole = null;
-    let subRole = user.role ? user.role.toUpperCase() : null;   // ⭐ FIX
+    let subRole = user.role ? user.role.toUpperCase() : null;
 
-    if (userType === "system") systemRole = user.role ? user.role.toUpperCase() : null; // ⭐ FIX
+    if (userType === "system") systemRole = user.role ? user.role.toUpperCase() : null;
     if (userType === "vendor") systemRole = "VENDOR_USER";
     if (userType === "society") systemRole = "SOCIETY_USER";
 
@@ -114,7 +114,7 @@ const login = async (req, res) => {
 
     if (userType === "vendor")
       redirectTo = `/vendor-dashboard/${user.vendor_id}`;
-    crm-vendor-dashboard
+
     if (userType === "society")
       redirectTo = `/society-dashboard/${user.society_id}`;
 
