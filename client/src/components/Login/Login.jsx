@@ -9,22 +9,22 @@ function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-    const handleLogin = async (e) => {
-        e.preventDefault();
-        setError("");
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError("");
 
-        if (!username || !password) {
-            setError("All fields are required");
-            return;
-        }
+    if (!username || !password) {
+      setError("All fields are required");
+      return;
+    }
 
     try {
       setLoading(true);
 
       const res = await fetch("/api/auth/login", {
         method: "POST",
-        headers: { 
-          "Content-Type": "application/json" 
+        headers: {
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           email: username,
@@ -32,57 +32,67 @@ function Login() {
         }),
       });
 
-            const response = await res.json();
+      const response = await res.json();
 
-      console.log("LOGIN RESPONSE 👉", response); // ⭐ DEBUG
+      console.log("LOGIN RESPONSE 👉", response);
 
       if (!res.ok) {
         setError(response.message || "Login failed");
         return;
       }
 
-      // ✅ CLEAR OLD SESSION
+      //  CLEAR OLD SESSION
       localStorage.clear();
 
-      // ✅ FORCE PASSWORD CHANGE
+      // FORCE PASSWORD CHANGE FLOW
       if (response.firstLogin) {
         localStorage.setItem("token", response.token);
+        localStorage.setItem("systemRole", response.systemRole || "");
+        localStorage.setItem("subRole", response.subRole || "");
+        localStorage.setItem("userType", response.userType || "");
+
         navigate("/change-password", { replace: true });
         return;
       }
 
-      // ✅ SAVE AUTH
+      //SAVE AUTH SESSION (UPDATED)
       localStorage.setItem("token", response.token);
-      localStorage.setItem("role", response.role || "");
+      localStorage.setItem("systemRole", response.systemRole || "");
+      localStorage.setItem("subRole", response.subRole || "");
       localStorage.setItem("userType", response.userType || "");
+      localStorage.setItem("username", response.username || username);
 
-      // ⭐⭐⭐ SAFE REDIRECT ⭐⭐⭐
+      //SAFE ROLE-BASED REDIRECT
       let redirectPath = response.redirectTo;
 
-      // fallback protection (VERY IMPORTANT)
       if (!redirectPath) {
+        switch (response.systemRole) {
+          case "ADMIN":
+            redirectPath = "/admin-dashboard";
+            break;
 
-        if (response.userType === "vendor") {
-          redirectPath = "/vendor/dashboard";
-        } 
-        else if (response.userType === "society") {
-          redirectPath = "/society/dashboard";
-        } 
-        else if (response.role === "admin") {
-          redirectPath = "/admin-dashboard";
-        } 
-        else if (response.role === "crm_vendor") {
-          redirectPath = "/crm-vendor-dashboard";
-        } 
-        else if (response.role === "crm_society") {
-          redirectPath = "/crm-society-dashboard";
-        } 
-        else {
-          redirectPath = "/";
+          case "CRM_VENDOR":
+            redirectPath = "/crm-vendor-dashboard";
+            break;
+
+          case "CRM_SOCIETY":
+            redirectPath = "/crm-society-dashboard";
+            break;
+
+          case "VENDOR_USER":
+            redirectPath = "/vendor/dashboard";
+            break;
+
+          case "SOCIETY_USER":
+            redirectPath = "/society/dashboard";
+            break;
+
+          default:
+            redirectPath = "/";
         }
       }
 
-      console.log("REDIRECTING TO 👉", redirectPath); // ⭐ DEBUG
+      console.log("REDIRECTING TO 👉", redirectPath); 
 
       navigate(redirectPath, { replace: true });
 
@@ -94,49 +104,49 @@ function Login() {
     }
   };
 
-    return (
-        <div className="pg-login-page">
-            <div className="pg-login-box">
-                <h2 className="pg-login-title">Login</h2>
+  return (
+    <div className="pg-login-page">
+      <div className="pg-login-box">
+        <h2 className="pg-login-title">Login</h2>
 
-                {error && <div className="pg-login-error">{error}</div>}
+        {error && <div className="pg-login-error">{error}</div>}
 
-                <form onSubmit={handleLogin}>
-                    <div className="pg-form-group">
-                        <label className="pg-form-label">Username / Email</label>
-                        <input
-                            type="text"
-                            className="pg-form-input"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                        />
-                    </div>
+        <form onSubmit={handleLogin}>
+          <div className="pg-form-group">
+            <label className="pg-form-label">Username / Email</label>
+            <input
+              type="text"
+              className="pg-form-input"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+          </div>
 
-                    <div className="pg-form-group">
-                        <label className="pg-form-label">Password</label>
-                        <input
-                            type="password"
-                            className="pg-form-input"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                        />
-                    </div>
+          <div className="pg-form-group">
+            <label className="pg-form-label">Password</label>
+            <input
+              type="password"
+              className="pg-form-input"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             className="pg-login-btn"
             disabled={loading}
           >
             {loading ? "Logging in..." : "Login"}
           </button>
 
-           <button
-              type="button"
-              className="forget-password"
-              onClick={() => navigate("/forgot-password")}
-              >
-                Forget Password?
-            </button>
+          <button
+            type="button"
+            className="forget-password"
+            onClick={() => navigate("/forgot-password")}
+          >
+            Forget Password?
+          </button>
         </form>
       </div>
     </div>

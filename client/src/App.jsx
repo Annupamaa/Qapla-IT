@@ -4,10 +4,10 @@ import {
   Route,
   NavLink,
   useLocation,
-  useNavigate,     
+  useNavigate,
 } from "react-router-dom";
 
-import axios from "axios"; 
+import axios from "axios";
 
 import VendorList from "./components/vendors/VendorList";
 import VendorForm from "./components/vendors/VendorForm";
@@ -35,19 +35,20 @@ function AppLayout({ children }) {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const role = localStorage.getItem("systemRole");
+
   const isAuthPage =
     location.pathname === "/login" ||
     location.pathname === "/change-password" ||
     location.pathname === "/forgot-password";
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+    localStorage.clear();
     delete axios.defaults.headers.common["Authorization"];
     navigate("/login");
   };
 
-  return <>{!isAuthPage && children(handleLogout)}</>;
+  return <>{!isAuthPage && children(handleLogout, role)}</>;
 }
 
 function App() {
@@ -55,7 +56,7 @@ function App() {
     <Router>
       <div className="App">
         <AppLayout>
-          {(handleLogout) => ( 
+          {(handleLogout, role) => (
             <>
               <header className="header">
                 <h1>PartnerGrid</h1>
@@ -66,54 +67,45 @@ function App() {
 
               <nav className="nav">
                 <ul>
-                  <li>
-                    <NavLink
-                      to="/vendors/register"
-                      className={({ isActive }) => (isActive ? "active" : "")}
-                    >
-                      Register Vendor
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to="/vendors"
-                      className={({ isActive }) => (isActive ? "active" : "")}
-                    >
-                      Vendors
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to="/vendor-users"
-                      className={({ isActive }) => (isActive ? "active" : "")}
-                    >
-                      Vendor Users
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to="/societies"
-                      className={({ isActive }) => (isActive ? "active" : "")}
-                    >
-                      Societies
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to="/society-users"
-                      className={({ isActive }) => (isActive ? "active" : "")}
-                    >
-                      Society Users
-                    </NavLink>
-                  </li>
-                  <li>
-                    <button
-                      onClick={handleLogout}
-                      className="nav-logout-btn"
-                    >
-                      Logout
-                    </button>
-                  </li>
+
+                  {/* //----Admin-------- */}
+                  {role === "ADMIN" && (
+                    <>
+                      <li><NavLink to="/vendors">Vendors</NavLink></li>
+                      <li><NavLink to="/vendor-users">Vendor Users</NavLink></li>
+                      <li><NavLink to="/societies">Societies</NavLink></li>
+                      <li><NavLink to="/society-users">Society Users</NavLink></li>
+                      <li><NavLink to="/admin-dashboard">Dashboard</NavLink></li>
+                    </>
+                  )}
+
+                  {/* ===== CRM VENDOR ===== */}
+                  {role === "CRM_VENDOR" && (
+                    <>
+                      <li><NavLink to="/vendors">Vendors</NavLink></li>
+                      <li><NavLink to="/vendor-users">Vendor Users</NavLink></li>
+                      <li><NavLink to="/crm-vendor-dashboard">Dashboard</NavLink></li>
+                    </>
+                  )}
+
+                  {/* ===== CRM SOCIETY ===== */}
+                  {role === "CRM_SOCIETY" && (
+                    <>
+                      <li><NavLink to="/societies">Societies</NavLink></li>
+                      <li><NavLink to="/society-users">Society Users</NavLink></li>
+                      <li><NavLink to="/crm-society-dashboard">Dashboard</NavLink></li>
+                    </>
+                  )}
+
+                  {/* ===== VENDOR USER ===== */}
+                  {role === "VENDOR_USER" && (
+                    <li><NavLink to="/vendor/dashboard">Dashboard</NavLink></li>
+                  )}
+
+                  {/* ===== SOCIETY USER ===== */}
+                  {role === "SOCIETY_USER" && (
+                    <li><NavLink to="/society/dashboard">Dashboard</NavLink></li>
+                  )}
 
                 </ul>
               </nav>
@@ -123,41 +115,44 @@ function App() {
 
         <div className="container">
           <Routes>
-            {/* Auth Pages */}
+
+            {/* Auth */}
             <Route path="/login" element={<Login />} />
             <Route path="/change-password" element={<ChangePassword />} />
             <Route path="/forgot-password" element={<ForgetPassword />} />
 
-            {/* App Pages */}
+            {/* Vendors */}
             <Route path="/" element={<VendorList />} />
             <Route path="/vendors" element={<VendorList />} />
             <Route path="/vendors/register" element={<VendorRegistration />} />
             <Route path="/vendors/new" element={<VendorForm />} />
             <Route path="/vendors/edit/:id" element={<VendorForm />} />
 
+            {/* Vendor Users */}
             <Route path="/vendor-users" element={<VendorUserList />} />
             <Route path="/vendor-users/new" element={<VendorUserForm />} />
             <Route path="/vendor-dashboard/:vendorId" element={<VendorDashboard />} />
             <Route path="/vendor-users/edit/:id" element={<VendorUserForm />} />
 
+            {/* Societies */}
             <Route path="/societies" element={<SocietyList />} />
             <Route path="/societies/new" element={<SocietyForm />} />
             <Route path="/society-dashboard/:societyId" element={<SocietyDashboard />} />
             <Route path="/societies/edit/:id" element={<SocietyForm />} />
 
+            {/* Society Users */}
             <Route path="/society-users" element={<SocietyUserList />} />
             <Route path="/society-users/new" element={<SocietyUserForm />} />
             <Route path="/society/dashboard" element={<SocietyUserProfile />} />
-            <Route path="/vendor/dashboard" element={<VendorUserProfile />} />
 
+            {/* Dashboards */}
+            <Route path="/vendor/dashboard" element={<VendorUserProfile />} />
             <Route path="/admin-dashboard" element={<Admin />} />
             <Route path="/crm-vendor-dashboard" element={<CrmVendor />} />
             <Route path="/crm-society-dashboard" element={<CrmSociety />} />
 
-            <Route
-              path="/society-users/edit/:id"
-              element={<SocietyUserForm />}
-            />
+            <Route path="/society-users/edit/:id" element={<SocietyUserForm />} />
+
           </Routes>
         </div>
       </div>
