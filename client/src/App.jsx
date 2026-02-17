@@ -7,6 +7,10 @@ import {
   useNavigate,
 } from "react-router-dom";
 
+import ProtectedRoute from "./components/ProtectedRoute";
+import { jwtDecode } from "jwt-decode";
+import { useEffect } from "react";
+
 import axios from "axios";
 
 import VendorList from "./components/vendors/VendorList";
@@ -52,6 +56,43 @@ function AppLayout({ children }) {
 }
 
 function App() {
+
+useEffect(() => {
+  const token = localStorage.getItem("token");
+
+  if (token) {
+    try {
+      const decoded = jwtDecode(token);
+
+      const currentPath = window.location.pathname;
+
+      if (decoded.role === "ADMIN" && currentPath === "/") {
+        window.location.href = "/admin-dashboard";
+      }
+
+      if (decoded.role === "CRM_VENDOR" && currentPath === "/") {
+        window.location.href = "/crm-vendor-dashboard";
+      }
+
+      if (decoded.role === "CRM_SOCIETY" && currentPath === "/") {
+        window.location.href = "/crm-society-dashboard";
+      }
+
+      if (decoded.role === "VENDOR_USER" && currentPath === "/") {
+        window.location.href = "/vendor/dashboard";
+      }
+
+      if (decoded.role === "SOCIETY_USER" && currentPath === "/") {
+        window.location.href = "/society/dashboard";
+      }
+
+    } catch (err) {
+      localStorage.clear();
+    }
+  }
+}, []);
+
+
   return (
     <Router>
       <div className="App">
@@ -143,13 +184,53 @@ function App() {
             {/* Society Users */}
             <Route path="/society-users" element={<SocietyUserList />} />
             <Route path="/society-users/new" element={<SocietyUserForm />} />
-            <Route path="/society/dashboard" element={<SocietyUserProfile />} />
+            <Route
+  path="/society/dashboard"
+  element={
+    <ProtectedRoute allowedRoles={["SOCIETY_USER"]}>
+      <SocietyUserProfile />
+    </ProtectedRoute>
+  }
+/>
+
 
             {/* Dashboards */}
-            <Route path="/vendor/dashboard" element={<VendorUserProfile />} />
-            <Route path="/admin-dashboard" element={<Admin />} />
-            <Route path="/crm-vendor-dashboard" element={<CrmVendor />} />
-            <Route path="/crm-society-dashboard" element={<CrmSociety />} />
+           <Route
+  path="/vendor/dashboard"
+  element={
+    <ProtectedRoute allowedRoles={["VENDOR_USER"]}>
+      <VendorUserProfile />
+    </ProtectedRoute>
+  }
+/>
+
+            <Route
+  path="/admin-dashboard"
+  element={
+    <ProtectedRoute allowedRoles={["ADMIN"]}>
+      <Admin />
+    </ProtectedRoute>
+  }
+/>
+
+            <Route
+  path="/crm-vendor-dashboard"
+  element={
+    <ProtectedRoute allowedRoles={["CRM_VENDOR"]}>
+      <CrmVendor />
+    </ProtectedRoute>
+  }
+/>
+
+            <Route
+  path="/crm-society-dashboard"
+  element={
+    <ProtectedRoute allowedRoles={["CRM_SOCIETY"]}>
+      <CrmSociety />
+    </ProtectedRoute>
+  }
+/>
+
 
             <Route path="/society-users/edit/:id" element={<SocietyUserForm />} />
 
