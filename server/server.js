@@ -11,8 +11,6 @@ const societyMeRoutes = require("./routes/societyMeRoutes");
 const serviceRequestRoutes = require("./routes/serviceRequestRoutes");
 const dropdownRoutes = require("./routes/dropdownRoutes");
 
-app.use("/api/service-requests", serviceRequestRoutes);
-
 
 const app = express();
 const PORT = process.env.PORT || 5001;

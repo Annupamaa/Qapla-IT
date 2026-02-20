@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const DropdownController = require("../controllers/dropdownController");
-const authMiddleware = require("../middlewares/authMiddleware");
+const authMiddleware = require("../middleware/authMiddleware");
 
 // Example:
 // GET /api/dropdowns/statuses

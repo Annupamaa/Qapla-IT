@@ -1,4 +1,4 @@
-const db = require("../config/db");
+const db = require("../config/database");
 const ServiceRequest = require("../models/ServiceRequest");
 const ServiceRequestLog = require("../models/ServiceRequestLog");
 

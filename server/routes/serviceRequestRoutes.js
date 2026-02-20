@@ -4,7 +4,7 @@ const router = express.Router();
 const ServiceRequestController = require("../controllers/serviceRequestController");
 
 // If you have auth middleware
-const authMiddleware = require("../middlewares/authMiddleware");
+const authMiddleware = require("../middleware/authMiddleware");
 
 // ===============================
 // CREATE
