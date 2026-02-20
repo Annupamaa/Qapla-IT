@@ -2,15 +2,26 @@ const db = require("../config/database");
 
 class ServiceRequest {
 
-    static async create(data) {
+    static async create(data, userId) {
+
+        // Generate ID like req01
+        const [rows] = await db.query(
+            "SELECT COUNT(*) as count FROM service_requests"
+        );
+    
+        const newId = `req${rows[0].count + 1}`;
+        const requestNo = `SR-${rows[0].count + 1}`;
+    
         const [result] = await db.query(
             `INSERT INTO service_requests
-      (id, status_id, priority_id, trigger_id,
-       category_id, subcategory_id,
-       approximate_value_id, summary, description)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            (id, request_no, status_id, priority_id, trigger_id,
+             category_id, subcategory_id,
+             approximate_value_id, summary, description,
+             society_id, created_by_user_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
-                data.id,
+                newId,
+                requestNo,
                 data.status_id,
                 data.priority_id,
                 data.trigger_id,
@@ -18,11 +29,13 @@ class ServiceRequest {
                 data.subcategory_id,
                 data.approximate_value_id,
                 data.summary,
-                data.description
+                data.description,
+                data.society_id,
+                userId
             ]
         );
-
-        return result;
+    
+        return newId;
     }
 
     static async findById(id) {

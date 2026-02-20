@@ -7,7 +7,7 @@ const CreateServiceRequest = () => {
     const navigate = useNavigate()
 
     const [formData, setFormData] = useState({
-        requestNo: "AUTO_GEN",
+        // requestNo: "AUTO_GEN",
         priority: "",
         trigger: "",
         category: "",
@@ -114,14 +114,14 @@ const CreateServiceRequest = () => {
 
                 <form onSubmit={handleSubmit}>
 
-                    <div className="form-group">
+                    {/* <div className="form-group">
                         <label>Request No.</label>
                         <input
                             type="text"
                             value={formData.requestNo}
                             disabled
                         />
-                    </div>
+                    </div> */}
 
                     <div className="form-group">
                         <label>Priority</label>
