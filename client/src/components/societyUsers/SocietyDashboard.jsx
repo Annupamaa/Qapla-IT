@@ -40,12 +40,22 @@ const SocietyDashboard = () => {
             <div className="table-container">
                 <div className="table-header">
                     <h2>Society Details</h2>
-                    <button
-                        className="btn btn-secondary"
-                        onClick={() => navigate(`/societies/edit/${society.id}`)}
-                    >
-                        Edit Society
-                    </button>
+
+                    <div style={{ display: "flex", gap: "10px" }}>
+                        <button
+                            className="btn btn-primary"
+                            onClick={() => navigate(`/service-requests/new/${society.id}`)}
+                        >
+                            Create Service Request
+                        </button>
+
+                        <button
+                            className="btn btn-secondary"
+                            onClick={() => navigate(`/societies/edit/${society.id}`)}
+                        >
+                            Edit Society
+                        </button>
+                    </div>
                 </div>
 
                 <table>
@@ -124,4 +134,4 @@ const SocietyDashboard = () => {
     )
 }
 
-export default SocietyDashboard;
+export default SocietyDashboard

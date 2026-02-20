@@ -32,6 +32,8 @@ import CrmVendor from "./components/dashboard/CrmVendor";
 import CrmSociety from "./components/dashboard/CrmSociety";
 import VendorDashboard from "./components/vendorUsers/VendorDashboard";
 import SocietyDashboard from "./components/societyUsers/SocietyDashboard";
+import CreateServiceRequest from './components/societyUsers/CreateServiceRequest'
+
 
 import "./App.css";
 
@@ -184,6 +186,11 @@ useEffect(() => {
             {/* Society Users */}
             <Route path="/society-users" element={<SocietyUserList />} />
             <Route path="/society-users/new" element={<SocietyUserForm />} />
+            <Route
+  path="/service-requests/new/:societyId"
+  element={<CreateServiceRequest />}
+/>
+
             <Route
   path="/society/dashboard"
   element={
