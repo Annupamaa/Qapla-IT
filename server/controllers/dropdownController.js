@@ -24,8 +24,8 @@ class DropdownController {
 
         try {
             const [rows] = await db.query(
-                `SELECT id, name FROM ${tableName} ORDER BY id ASC`
-            );
+    `SELECT id, label FROM ${tableName} WHERE is_active = TRUE ORDER BY id ASC`
+);
 
             res.json(rows);
 

@@ -1,5 +1,6 @@
-import { useState } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useState, useEffect } from "react"
+import { useParams, useNavigate } from "react-router-dom"
+import axios from "axios"
 
 const CreateServiceRequest = () => {
     const { societyId } = useParams()
@@ -16,6 +17,45 @@ const CreateServiceRequest = () => {
         approximateValue: ""
     })
 
+    const [priorities, setPriorities] = useState([])
+    const [triggers, setTriggers] = useState([])
+    const [categories, setCategories] = useState([])
+    const [subCategories, setSubCategories] = useState([])
+    const [approximateValues, setApproximateValues] = useState([])
+
+    useEffect(() => {
+        fetchDropdowns()
+    }, [])
+
+    const fetchDropdowns = async () => {
+        try {
+            const token = localStorage.getItem("token")
+
+            const config = {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+
+            const [p, t, c, sc, av] = await Promise.all([
+                axios.get("http://localhost:5001/api/dropdowns/priorities", config),
+                axios.get("http://localhost:5001/api/dropdowns/triggers", config),
+                axios.get("http://localhost:5001/api/dropdowns/categories", config),
+                axios.get("http://localhost:5001/api/dropdowns/subcategories", config),
+                axios.get("http://localhost:5001/api/dropdowns/approximate_values", config)
+            ])
+
+            setPriorities(p.data)
+            setTriggers(t.data)
+            setCategories(c.data)
+            setSubCategories(sc.data)
+            setApproximateValues(av.data)
+
+        } catch (error) {
+            console.error("Failed to load dropdowns", error)
+        }
+    }
+
     const handleChange = (e) => {
         setFormData({
             ...formData,
@@ -23,20 +63,40 @@ const CreateServiceRequest = () => {
         })
     }
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault()
 
-        console.log("Submitting Service Request:", {
-            ...formData,
-            societyId
-        })
+        try {
+            const token = localStorage.getItem("token")
 
-        // 👉 Call your API here
+            await axios.post(
+                "http://localhost:5001/api/service-requests",
+                {
+                    society_id: societyId,
+                    status_id: 1, // NEW
+                    priority_id: formData.priority,
+                    trigger_id: formData.trigger,
+                    category_id: formData.category,
+                    subcategory_id: formData.subCategory,
+                    approximate_value_id: formData.approximateValue,
+                    summary: formData.summary,
+                    description: formData.description
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            )
 
-        alert("Service Request Created Successfully!")
+            alert("Service Request Created Successfully!")
 
-        // Redirect back to dashboard
-        navigate(`/society-dashboard/${societyId}`)
+            navigate(`/society-dashboard/${societyId}`)
+
+        } catch (error) {
+            console.error("Error creating service request", error)
+            alert("Failed to create service request")
+        }
     }
 
     return (
@@ -67,9 +127,11 @@ const CreateServiceRequest = () => {
                         <label>Priority</label>
                         <select name="priority" value={formData.priority} onChange={handleChange} required>
                             <option value="">Select</option>
-                            <option value="high">High</option>
-                            <option value="medium">Medium</option>
-                            <option value="low">Low</option>
+                            {priorities.map((p) => (
+                                <option key={p.id} value={p.id}>
+                                    {p.label}
+                                </option>
+                            ))}
                         </select>
                     </div>
 
@@ -77,9 +139,11 @@ const CreateServiceRequest = () => {
                         <label>Trigger</label>
                         <select name="trigger" value={formData.trigger} onChange={handleChange} required>
                             <option value="">Select</option>
-                            <option value="complain">Complaint</option>
-                            <option value="maintenance">Maintenance</option>
-                            <option value="new requirement">New Requirement</option>
+                            {triggers.map((t) => (
+                                <option key={t.id} value={t.id}>
+                                    {t.label}
+                                </option>
+                            ))}
                         </select>
                     </div>
 
@@ -87,20 +151,23 @@ const CreateServiceRequest = () => {
                         <label>Category</label>
                         <select name="category" value={formData.category} onChange={handleChange} required>
                             <option value="">Select</option>
-                            <option value="buy">Buy</option>
-                            <option value="repair">Repair</option>
-                            <option value="servicing">Servicing</option>
-                            <option value="sell">Sell</option>
+                            {categories.map((c) => (
+                                <option key={c.id} value={c.id}>
+                                    {c.label}
+                                </option>
+                            ))}
                         </select>
                     </div>
 
                     <div className="form-group">
                         <label>Sub Category</label>
-                        <select name="subCategory" value={formData.subCategory} onChange={handleChange}>
+                        <select name="subCategory" value={formData.subCategory} onChange={handleChange} required>
                             <option value="">Select</option>
-                            <option value="electrical">Electrical</option>
-                            <option value="carpentry">Carpentry</option>
-                            <option value="toys">Toys</option>
+                            {subCategories.map((sc) => (
+                                <option key={sc.id} value={sc.id}>
+                                    {sc.label}
+                                </option>
+                            ))}
                         </select>
                     </div>
 
@@ -133,10 +200,14 @@ const CreateServiceRequest = () => {
                             name="approximateValue"
                             value={formData.approximateValue}
                             onChange={handleChange}
+                            required
                         >
                             <option value="">Select</option>
-                            <option value="less than 100000">Less than 100000</option>
-                            <option value="more than 100000">More than 100000</option>
+                            {approximateValues.map((av) => (
+                                <option key={av.id} value={av.id}>
+                                    {av.label}
+                                </option>
+                            ))}
                         </select>
                     </div>
 
