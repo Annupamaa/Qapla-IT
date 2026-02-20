@@ -8,6 +8,11 @@ const societyRoutes = require("./routes/societyRoutes");
 const societyUserRoutes = require("./routes/societyUserRoutes");
 const authRoutes = require("./routes/authRoutes");
 const societyMeRoutes = require("./routes/societyMeRoutes");
+const serviceRequestRoutes = require("./routes/serviceRequestRoutes");
+const dropdownRoutes = require("./routes/dropdownRoutes");
+
+app.use("/api/service-requests", serviceRequestRoutes);
+
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -24,6 +29,8 @@ app.use("/api/societies", societyRoutes);
 app.use("/api/society-users", societyUserRoutes);
 app.use("/api/society", societyMeRoutes);
 app.use("/api/auth", authRoutes);
+app.use("/api/service-requests", serviceRequestRoutes);
+app.use("/api/dropdowns", dropdownRoutes);
 
 // Health check
 app.get("/api/health", (req, res) => {

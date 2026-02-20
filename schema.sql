@@ -204,3 +204,129 @@ CREATE TABLE system_users (
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         ON UPDATE CURRENT_TIMESTAMP
 );
+
+-- =====================================================================
+-- PRIORITIES (LOW, MEDIUM, HIGH, CRITICAL)
+-- =====================================================================
+CREATE TABLE priorities (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    label VARCHAR(50) NOT NULL,
+    level INT NOT NULL,
+    is_active BOOLEAN DEFAULT TRUE
+);
+
+-- =====================================================================
+-- REQUEST TRIGGERS (Complaint, Maintenance, etc.)
+-- =====================================================================
+CREATE TABLE request_triggers (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    label VARCHAR(100) NOT NULL,
+    is_active BOOLEAN DEFAULT TRUE
+);
+
+-- =====================================================================
+-- REQUEST CATEGORIES (Electrical, Plumbing, etc.)
+-- =====================================================================
+CREATE TABLE request_categories (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    label VARCHAR(100) NOT NULL,
+    is_active BOOLEAN DEFAULT TRUE
+);
+
+-- =====================================================================
+-- REQUEST SUBCATEGORIES
+-- =====================================================================
+CREATE TABLE request_subcategories (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    category_id INT NOT NULL,
+    label VARCHAR(100) NOT NULL,
+    is_active BOOLEAN DEFAULT TRUE,
+
+    FOREIGN KEY (category_id) REFERENCES request_categories(id)
+);
+
+-- =====================================================================
+-- APPROXIMATE VALUES (Estimated Cost Ranges)
+-- =====================================================================
+CREATE TABLE approximate_values (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    label VARCHAR(100) NOT NULL,
+    min_amount DECIMAL(12,2),
+    max_amount DECIMAL(12,2),
+    is_active BOOLEAN DEFAULT TRUE
+);
+
+-- =====================================================================
+-- REQUEST STATUSES (NEW → COMPLETED → CANCELLED)
+-- =====================================================================
+CREATE TABLE request_statuses (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    label VARCHAR(50) NOT NULL,
+    order_sequence INT NOT NULL,
+    is_active BOOLEAN DEFAULT TRUE
+);
+
+-- =====================================================================
+-- SERVICE REQUESTS (MAIN TABLE)
+-- =====================================================================
+CREATE TABLE service_requests (
+    id VARCHAR(20) PRIMARY KEY,   -- req01, req02
+
+    request_no VARCHAR(20) UNIQUE NOT NULL,
+
+    status_id INT NOT NULL,
+    priority_id INT NOT NULL,
+    trigger_id INT NOT NULL,
+    category_id INT NOT NULL,
+    subcategory_id INT NOT NULL,
+    approximate_value_id INT NOT NULL,
+
+    summary VARCHAR(100) NOT NULL,
+    description VARCHAR(500),
+
+    society_id INT NOT NULL,
+    created_by_user_id INT NOT NULL,
+    updated_by_user_id INT,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (status_id) REFERENCES request_statuses(id),
+    FOREIGN KEY (priority_id) REFERENCES priorities(id),
+    FOREIGN KEY (trigger_id) REFERENCES request_triggers(id),
+    FOREIGN KEY (category_id) REFERENCES request_categories(id),
+    FOREIGN KEY (subcategory_id) REFERENCES request_subcategories(id),
+    FOREIGN KEY (approximate_value_id) REFERENCES approximate_values(id)
+);
+
+-- =====================================================================
+-- SERVICE REQUEST LOGS (AUDIT / HISTORY TRACKING)
+-- =====================================================================
+CREATE TABLE service_request_logs (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+
+    service_request_id VARCHAR(20) NOT NULL,
+
+    status_id INT,
+    priority_id INT,
+    trigger_id INT,
+    category_id INT,
+    subcategory_id INT,
+    approximate_value_id INT,
+
+    summary VARCHAR(100),
+    description VARCHAR(500),
+
+    action_by_user_id INT NOT NULL,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (service_request_id) REFERENCES service_requests(id),
+    FOREIGN KEY (status_id) REFERENCES request_statuses(id),
+    FOREIGN KEY (priority_id) REFERENCES priorities(id),
+    FOREIGN KEY (trigger_id) REFERENCES request_triggers(id),
+    FOREIGN KEY (category_id) REFERENCES request_categories(id),
+    FOREIGN KEY (subcategory_id) REFERENCES request_subcategories(id),
+    FOREIGN KEY (approximate_value_id) REFERENCES approximate_values(id)
+);
