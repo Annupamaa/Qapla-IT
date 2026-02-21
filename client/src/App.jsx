@@ -32,8 +32,9 @@ import CrmVendor from "./components/dashboard/CrmVendor";
 import CrmSociety from "./components/dashboard/CrmSociety";
 import VendorDashboard from "./components/vendorUsers/VendorDashboard";
 import SocietyDashboard from "./components/societyUsers/SocietyDashboard";
-import CreateServiceRequest from './components/societyUsers/CreateServiceRequest'
-
+import CreateServiceRequest from "./components/societyUsers/CreateServiceRequest";
+import AllServiceRequests from "./components/societyUsers/AllServiceRequests";
+import MyServiceRequests from "./components/societyUsers/MyServiceRequests";
 
 import "./App.css";
 
@@ -58,7 +59,6 @@ function AppLayout({ children }) {
 }
 
 function App() {
-
   useEffect(() => {
     const token = localStorage.getItem("token");
 
@@ -87,13 +87,11 @@ function App() {
         if (decoded.role === "SOCIETY_USER" && currentPath === "/") {
           window.location.href = "/society/dashboard";
         }
-
       } catch (err) {
         localStorage.clear();
       }
     }
   }, []);
-
 
   return (
     <Router>
@@ -103,53 +101,98 @@ function App() {
             <>
               <header className="header">
                 <h1>PartnerGrid</h1>
-                <p style={{ textAlign: "center", marginTop: "10px", opacity: 0.9 }}>
+                <p
+                  style={{
+                    textAlign: "center",
+                    marginTop: "10px",
+                    opacity: 0.9,
+                  }}
+                >
                   Vendor & Society Onboarding System
                 </p>
               </header>
 
               <nav className="nav">
                 <ul>
-
                   {/* //----Admin-------- */}
                   {role === "ADMIN" && (
                     <>
-                      <li><NavLink to="/vendors">Vendors</NavLink></li>
-                      <li><NavLink to="/vendor-users">Vendor Users</NavLink></li>
-                      <li><NavLink to="/societies">Societies</NavLink></li>
-                      <li><NavLink to="/society-users">Society Users</NavLink></li>
-                      <li><NavLink to="/admin-dashboard">Dashboard</NavLink></li>
+                      <li>
+                        <NavLink to="/vendors">Vendors</NavLink>
+                      </li>
+                      <li>
+                        <NavLink to="/vendor-users">Vendor Users</NavLink>
+                      </li>
+                      <li>
+                        <NavLink to="/societies">Societies</NavLink>
+                      </li>
+                      <li>
+                        <NavLink to="/society-users">Society Users</NavLink>
+                      </li>
+                      <li>
+                        <NavLink to="/admin-dashboard">Dashboard</NavLink>
+                      </li>
                     </>
                   )}
 
                   {/* ===== CRM VENDOR ===== */}
                   {role === "CRM_VENDOR" && (
                     <>
-                      <li><NavLink to="/vendors">Vendors</NavLink></li>
-                      <li><NavLink to="/vendor-users">Vendor Users</NavLink></li>
-                      <li><NavLink to="/crm-vendor-dashboard">Dashboard</NavLink></li>
+                      <li>
+                        <NavLink to="/vendors">Vendors</NavLink>
+                      </li>
+                      <li>
+                        <NavLink to="/vendor-users">Vendor Users</NavLink>
+                      </li>
+                      <li>
+                        <NavLink to="/crm-vendor-dashboard">Dashboard</NavLink>
+                      </li>
                     </>
                   )}
 
                   {/* ===== CRM SOCIETY ===== */}
                   {role === "CRM_SOCIETY" && (
                     <>
-                      <li><NavLink to="/societies">Societies</NavLink></li>
-                      <li><NavLink to="/society-users">Society Users</NavLink></li>
-                      <li><NavLink to="/crm-society-dashboard">Dashboard</NavLink></li>
+                      <li>
+                        <NavLink to="/societies">Societies</NavLink>
+                      </li>
+                      <li>
+                        <NavLink to="/society-users">Society Users</NavLink>
+                      </li>
+                      <li>
+                        <NavLink to="/crm-society-dashboard">Dashboard</NavLink>
+                      </li>
                     </>
                   )}
 
                   {/* ===== VENDOR USER ===== */}
                   {role === "VENDOR_USER" && (
-                    <li><NavLink to="/vendor/dashboard">Dashboard</NavLink></li>
+                    <li>
+                      <NavLink to="/vendor/dashboard">Dashboard</NavLink>
+                    </li>
                   )}
 
                   {/* ===== SOCIETY USER ===== */}
                   {role === "SOCIETY_USER" && (
-                    <li><NavLink to="/society/dashboard">Dashboard</NavLink></li>
-                  )}
+                    <>
+                      <li>
+                        <NavLink to="/society/dashboard">Dashboard</NavLink>
+                      </li>
 
+                      <li>
+                        <NavLink to="/service-requests/new/1">
+                          Create Request
+                        </NavLink>
+                      </li>
+
+                      <li>
+                        <NavLink to="/service-requests">All Requests</NavLink>
+                      </li>
+                      <li>
+                        <NavLink to="/service-requests/my">My Requests</NavLink>
+                      </li>
+                    </>
+                  )}
                 </ul>
               </nav>
             </>
@@ -158,7 +201,6 @@ function App() {
 
         <div className="container">
           <Routes>
-
             {/* Auth */}
             <Route path="/login" element={<Login />} />
             <Route path="/change-password" element={<ChangePassword />} />
@@ -174,13 +216,19 @@ function App() {
             {/* Vendor Users */}
             <Route path="/vendor-users" element={<VendorUserList />} />
             <Route path="/vendor-users/new" element={<VendorUserForm />} />
-            <Route path="/vendor-dashboard/:vendorId" element={<VendorDashboard />} />
+            <Route
+              path="/vendor-dashboard/:vendorId"
+              element={<VendorDashboard />}
+            />
             <Route path="/vendor-users/edit/:id" element={<VendorUserForm />} />
 
             {/* Societies */}
             <Route path="/societies" element={<SocietyList />} />
             <Route path="/societies/new" element={<SocietyForm />} />
-            <Route path="/society-dashboard/:societyId" element={<SocietyDashboard />} />
+            <Route
+              path="/society-dashboard/:societyId"
+              element={<SocietyDashboard />}
+            />
             <Route path="/societies/edit/:id" element={<SocietyForm />} />
 
             {/* Society Users */}
@@ -189,6 +237,18 @@ function App() {
             <Route
               path="/service-requests/new/:societyId"
               element={<CreateServiceRequest />}
+            />
+            <Route path="/service-requests" element={<AllServiceRequests />} />
+            {/* NEW: My Requests */}
+            <Route
+              path="/service-requests/my"
+              element={<MyServiceRequests />}
+            />
+
+            {/* NEW: Edit Request */}
+            <Route
+              path="/service-requests/edit/:id"
+              element={<CreateServiceRequest editMode={true} />}
             />
 
             <Route
@@ -199,7 +259,6 @@ function App() {
                 </ProtectedRoute>
               }
             />
-
 
             {/* Dashboards */}
             <Route
@@ -238,8 +297,10 @@ function App() {
               }
             />
 
-            <Route path="/society-users/edit/:id" element={<SocietyUserForm />} />
-
+            <Route
+              path="/society-users/edit/:id"
+              element={<SocietyUserForm />}
+            />
           </Routes>
         </div>
       </div>

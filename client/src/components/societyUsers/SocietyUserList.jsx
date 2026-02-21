@@ -125,7 +125,6 @@ const SocietyUserList = () => {
                   <button
                     className="btn btn-secondary"
                     onClick={() => {
-                      console.log("Editing user id:", user.id);
                       navigate(`/society-users/edit/${user.id}`);
                     }}
                   >

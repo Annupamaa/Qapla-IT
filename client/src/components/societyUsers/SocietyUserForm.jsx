@@ -45,7 +45,6 @@ const SocietyUserForm = () => {
     try {
       setLoading(true);
       const response = await societyUsersAPI.getById(id);
-      console.log("API Response for user:", response.data);
       const user = response.data.data;
       setFormData({
         society_id: user.society_id,
