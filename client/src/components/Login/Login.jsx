@@ -62,6 +62,10 @@ function Login() {
       localStorage.setItem("userType", response.userType || "");
       localStorage.setItem("username", response.username || username);
 
+      if (response.societyId) {
+        localStorage.setItem("societyId", response.societyId);
+      }
+
       //SAFE ROLE-BASED REDIRECT
       let redirectPath = response.redirectTo;
 
@@ -92,10 +96,9 @@ function Login() {
         }
       }
 
-      console.log("REDIRECTING TO 👉", redirectPath); 
+      console.log("REDIRECTING TO 👉", redirectPath);
 
       navigate(redirectPath, { replace: true });
-
     } catch (err) {
       console.error("LOGIN ERROR:", err);
       setError("Server error. Try again later.");
@@ -132,11 +135,7 @@ function Login() {
             />
           </div>
 
-          <button
-            type="submit"
-            className="pg-login-btn"
-            disabled={loading}
-          >
+          <button type="submit" className="pg-login-btn" disabled={loading}>
             {loading ? "Logging in..." : "Login"}
           </button>
 
