@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 const MyServiceRequests = () => {
   const [requests, setRequests] = useState([]);
@@ -8,9 +9,11 @@ const MyServiceRequests = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
+  const location = useLocation();
+
   useEffect(() => {
     fetchMyRequests();
-  }, []);
+  }, [location]);
 
   const fetchMyRequests = async () => {
     try {

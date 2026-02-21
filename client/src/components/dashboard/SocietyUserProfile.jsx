@@ -55,10 +55,6 @@ const SocietyUserProfile = () => {
 
       <table>
         <tbody>
-          <tr>
-            <th>ID</th>
-            <td>{user.id}</td>
-          </tr>
 
           <tr>
             <th>Full Name</th>

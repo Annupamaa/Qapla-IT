@@ -18,7 +18,7 @@ router.get(
     '/society',
     authMiddleware,
     allowRoles("CRM_SOCIETY"),
-    crmDashboardController.societyDashboard
+    crmDashboardController.societyDetails
 );
 
 module.exports = router;

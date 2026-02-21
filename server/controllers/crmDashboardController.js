@@ -32,7 +32,7 @@ exports.vendorDashboard = async (req, res) => {
 // =========================
 // CRM SOCIETY DASHBOARD
 // =========================
-exports.societyDashboard = async (req, res) => {
+exports.societyDetails = async (req, res) => {
     try {
         const totalSocieties = await Society.countAll();
         const totalSocietyUsers = await SocietyUser.countAll();

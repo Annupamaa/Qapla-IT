@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useLocation } from "react-router-dom";
 
 const AllServiceRequests = () => {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const location = useLocation();
 
   useEffect(() => {
     fetchRequests();

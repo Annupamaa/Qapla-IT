@@ -31,7 +31,7 @@ import Admin from "./components/dashboard/Admin";
 import CrmVendor from "./components/dashboard/CrmVendor";
 import CrmSociety from "./components/dashboard/CrmSociety";
 import VendorDashboard from "./components/vendorUsers/VendorDashboard";
-import SocietyDashboard from "./components/societyUsers/SocietyDashboard";
+import SocietyDetails from "./components/societyUsers/SocietyDetails";
 import CreateServiceRequest from "./components/societyUsers/CreateServiceRequest";
 import AllServiceRequests from "./components/societyUsers/AllServiceRequests";
 import MyServiceRequests from "./components/societyUsers/MyServiceRequests";
@@ -178,7 +178,9 @@ function App() {
                       <li>
                         <NavLink to="/society/dashboard">Dashboard</NavLink>
                       </li>
-
+                      <li>
+                        <NavLink to="/society-details">Society Details</NavLink>
+                      </li>
                       <li>
                         <NavLink to="/service-requests/new/1">
                           Create Request
@@ -225,10 +227,7 @@ function App() {
             {/* Societies */}
             <Route path="/societies" element={<SocietyList />} />
             <Route path="/societies/new" element={<SocietyForm />} />
-            <Route
-              path="/society-dashboard/:societyId"
-              element={<SocietyDashboard />}
-            />
+            <Route path="/society-details" element={<SocietyDetails />} />
             <Route path="/societies/edit/:id" element={<SocietyForm />} />
 
             {/* Society Users */}

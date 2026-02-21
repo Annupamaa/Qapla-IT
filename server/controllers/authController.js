@@ -116,7 +116,7 @@ const login = async (req, res) => {
       redirectTo = `/vendor-dashboard/${user.vendor_id}`;
 
     if (userType === "society")
-      redirectTo = `/society-dashboard/${user.society_id}`;
+      redirectTo = `/society/dashboard`;
 
     return res.json({
       success: true,
