@@ -77,13 +77,16 @@ class ServiceRequestController {
     // ===============================
     static async createRequest(req, res) {
         try {
-            const data = req.body;
-
+            const data = {
+                ...req.body,
+                society_id: req.user.societyId
+            };
+    
             const newId = await ServiceRequest.create(
                 data,
                 req.user.id, // from auth middleware
             );
-
+    
             res.status(201).json({
                 message: "Service request created successfully",
                 id: newId,

@@ -7,18 +7,24 @@ class ServiceRequest {
             "SELECT COUNT(*) as count FROM service_requests",
         );
 
-        const newId = `req${rows[0].count + 1}`;
-        const requestNo = `SR-${rows[0].count + 1}`;
+        const newNumber = rows[0].count + 1;
+
+        const newId = `req${newNumber}`;
+        const requestNo = `SR-${newNumber}`;
+
+        console.log("Generated ID:", newId);
+        console.log("Generated Request No:", requestNo);
 
         const [result] = await db.query(
             `INSERT INTO service_requests
-  (request_no, status_id, priority_id, trigger_id,
-   category_id, subcategory_id,
-   approximate_value_id, summary, description,
-   society_id, created_by_user_id)
-  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            (id, request_no, status_id, priority_id, trigger_id,
+             category_id, subcategory_id,
+             approximate_value_id, summary, description,
+             society_id, created_by_user_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
-                `SR-${rows[0].count + 1}`, // request_no
+                newId,                  
+                requestNo,
                 data.status_id,
                 data.priority_id,
                 data.trigger_id,
@@ -32,7 +38,7 @@ class ServiceRequest {
             ],
         );
 
-        return result.insertId; // numeric ID
+        return newId;
     }
 
     static async findById(id) {
@@ -57,7 +63,7 @@ class ServiceRequest {
             description = ?,
             updated_by_user_id = ?
         WHERE id = ?`;
-    
+
         const params = [
             data.status_id,
             data.priority_id,
@@ -70,7 +76,7 @@ class ServiceRequest {
             userId,
             id,
         ];
-    
+
         await connection.query(query, params);
     }
 
