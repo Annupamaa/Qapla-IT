@@ -10,7 +10,7 @@ const authRoutes = require("./routes/authRoutes");
 const societyMeRoutes = require("./routes/societyMeRoutes");
 const serviceRequestRoutes = require("./routes/serviceRequestRoutes");
 const dropdownRoutes = require("./routes/dropdownRoutes");
-
+const vendorRequestRoutes = require("./routes/VendorRequestRoute")
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -29,6 +29,7 @@ app.use("/api/society", societyMeRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/service-requests", serviceRequestRoutes);
 app.use("/api/dropdowns", dropdownRoutes);
+app.use("/api/vendor-requests", vendorRequestRoutes)
 
 // Health check
 app.get("/api/health", (req, res) => {

@@ -15,18 +15,19 @@ class ServiceRequestController {
             }
 
             const query = `
-    SELECT sr.id,
-           sr.request_no,
-           sr.summary,
-           rs.label as status,
-           p.label as priority,
-           su.full_name as created_by_name
-    FROM service_requests sr
-    JOIN request_statuses rs ON sr.status_id = rs.id
-    JOIN priorities p ON sr.priority_id = p.id
-    JOIN society_users su ON sr.created_by_user_id = su.id
-    WHERE sr.society_id = ?
-    ORDER BY sr.created_at DESC
+SELECT sr.id,
+       sr.request_no,
+       sr.summary,
+       rs.id as status_id,
+       rs.label as status,
+       p.label as priority,
+       su.full_name as created_by_name
+FROM service_requests sr
+JOIN request_statuses rs ON sr.status_id = rs.code
+JOIN priorities p ON sr.priority_id = p.code
+JOIN society_users su ON sr.created_by_user_id = su.id
+WHERE sr.society_id = ?
+ORDER BY sr.created_at DESC
 `;
 
             const [rows] = await db.query(query, [societyIdFromToken]);
@@ -53,16 +54,18 @@ class ServiceRequestController {
             SELECT sr.id,
                    sr.request_no,
                    sr.summary,
+                   rs.id as status_id,
                    rs.label as status,
                    p.label as priority,
                    su.full_name as created_by_name
             FROM service_requests sr
-            JOIN request_statuses rs ON sr.status_id = rs.id
-            JOIN priorities p ON sr.priority_id = p.id
+            JOIN request_statuses rs ON sr.status_id = rs.code
+            JOIN priorities p ON sr.priority_id = p.code
             JOIN society_users su ON sr.created_by_user_id = su.id
-            WHERE sr.created_by_user_id = ? AND sr.society_id = ?
+            WHERE sr.created_by_user_id = ? 
+            AND sr.society_id = ?
             ORDER BY sr.created_at DESC
-        `;
+            `;
 
             const [rows] = await db.query(query, [userId, societyId]);
 
@@ -81,12 +84,12 @@ class ServiceRequestController {
                 ...req.body,
                 society_id: req.user.societyId
             };
-    
+
             const newId = await ServiceRequest.create(
                 data,
                 req.user.id, // from auth middleware
             );
-    
+
             res.status(201).json({
                 message: "Service request created successfully",
                 id: newId,
@@ -134,6 +137,62 @@ class ServiceRequestController {
         }
     }
 
+    static async approveRequest(req, res) {
+        try {
+
+            const { id } = req.params;
+
+            await ServiceRequest.updateStatus(
+                id,
+                "APR",
+                req.user.id
+            );
+
+            res.json({ message: "Request approved successfully" });
+
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+
+    static async cancelRequest(req, res) {
+        try {
+
+            const { id } = req.params;
+
+            await ServiceRequest.updateStatus(
+                id,
+                "CAN",
+                req.user.id
+            );
+
+            res.json({ message: "Request cancelled successfully" });
+
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+
+    static async publishRequest(req, res) {
+        try {
+
+            const { id } = req.params;
+
+            await ServiceRequest.updateStatus(
+                id,
+                "PUB",
+                req.user.id
+            );
+
+            res.json({ message: "Request published to vendors" });
+
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+
+
+
     // ===============================
     // GET ALL REQUESTS
     // ===============================
@@ -179,6 +238,82 @@ class ServiceRequestController {
             res.status(500).json({ error: error.message });
         }
     }
+
+    static async getPublishedRequests(req, res) {
+
+        try {
+    
+            const vendorId = req.user.id;
+    
+            const requests = await ServiceRequest.getPublishedRequests(vendorId);
+    
+            res.json(requests);
+    
+        } catch (error) {
+    
+            console.error(error);
+            res.status(500).json({ error: error.message });
+    
+        }
+    }
+
+    static async createResolution(req, res) {
+
+        try {
+    
+            const { request_id, resolution_number } = req.body;
+            const userId = req.user.id;
+    
+            // 1️⃣ Insert into resolution table
+            await db.query(
+            `
+            INSERT INTO service_request_resolutions
+            (request_id, resolution_number, created_by)
+            VALUES (?, ?, ?)
+            `,
+            [request_id, resolution_number, userId]
+            );
+    
+            // 2️⃣ Update main request
+            await ServiceRequest.createResolution(
+                request_id,
+                resolution_number
+            );
+    
+            res.json({
+                message: "Resolution created successfully"
+            });
+    
+        } catch (error) {
+    
+            console.error("CREATE RESOLUTION ERROR:", error);
+            res.status(500).json({ error: error.message });
+    
+        }
+    
+    }
+
+    static async issueWorkOrder(req, res) {
+
+        try {
+    
+            const { request_id } = req.body;
+    
+            await ServiceRequest.issueWorkOrder(request_id);
+    
+            res.json({
+                message: "Work order issued"
+            });
+    
+        } catch (error) {
+    
+            console.error("WORK ORDER ERROR:", error);
+            res.status(500).json({ error: error.message });
+    
+        }
+    
+    }
+
 }
 
 module.exports = ServiceRequestController;

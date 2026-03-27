@@ -35,7 +35,8 @@ import SocietyDetails from "./components/societyUsers/SocietyDetails";
 import CreateServiceRequest from "./components/societyUsers/CreateServiceRequest";
 import AllServiceRequests from "./components/societyUsers/AllServiceRequests";
 import MyServiceRequests from "./components/societyUsers/MyServiceRequests";
-
+import VendorServiceRequests from "./components/vendorUsers/VendorServiceRequests";
+import VendorRequestDetails from "./components/vendorUsers/VendorRequestDetails"
 import "./App.css";
 
 function AppLayout({ children }) {
@@ -167,9 +168,15 @@ function App() {
 
                   {/* ===== VENDOR USER ===== */}
                   {role === "VENDOR_USER" && (
-                    <li>
-                      <NavLink to="/vendor/dashboard">Dashboard</NavLink>
-                    </li>
+                    <>
+                      <li>
+                        <NavLink to="/vendor/dashboard">Dashboard</NavLink>
+                      </li>
+
+                      <li>
+                        <NavLink to="/vendor/service-requests">Service Requests</NavLink>
+                      </li>
+                    </>
                   )}
 
                   {/* ===== SOCIETY USER ===== */}
@@ -223,6 +230,22 @@ function App() {
               element={<VendorDashboard />}
             />
             <Route path="/vendor-users/edit/:id" element={<VendorUserForm />} />
+            <Route
+              path="/vendor/service-requests"
+              element={
+                <ProtectedRoute allowedRoles={["VENDOR_USER"]}>
+                  <VendorServiceRequests />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/vendor/request/:id"
+              element={
+                <ProtectedRoute allowedRoles={["VENDOR_USER"]}>
+                  <VendorRequestDetails />
+                </ProtectedRoute>
+              }
+            />
 
             {/* Societies */}
             <Route path="/societies" element={<SocietyList />} />

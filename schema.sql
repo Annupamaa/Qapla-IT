@@ -210,6 +210,7 @@ CREATE TABLE system_users (
 -- =====================================================================
 CREATE TABLE priorities (
     id INT PRIMARY KEY AUTO_INCREMENT,
+    code VARCHAR(10) NOT NULL UNIQUE,
     label VARCHAR(50) NOT NULL,
     level INT NOT NULL,
     is_active BOOLEAN DEFAULT TRUE
@@ -220,6 +221,7 @@ CREATE TABLE priorities (
 -- =====================================================================
 CREATE TABLE request_triggers (
     id INT PRIMARY KEY AUTO_INCREMENT,
+    code VARCHAR(10) NOT NULL UNIQUE,
     label VARCHAR(100) NOT NULL,
     is_active BOOLEAN DEFAULT TRUE
 );
@@ -229,6 +231,7 @@ CREATE TABLE request_triggers (
 -- =====================================================================
 CREATE TABLE request_categories (
     id INT PRIMARY KEY AUTO_INCREMENT,
+    code VARCHAR(10) NOT NULL UNIQUE,
     label VARCHAR(100) NOT NULL,
     is_active BOOLEAN DEFAULT TRUE
 );
@@ -239,6 +242,7 @@ CREATE TABLE request_categories (
 CREATE TABLE request_subcategories (
     id INT PRIMARY KEY AUTO_INCREMENT,
     category_id INT NOT NULL,
+    code VARCHAR(10) NOT NULL UNIQUE,
     label VARCHAR(100) NOT NULL,
     is_active BOOLEAN DEFAULT TRUE,
 
@@ -250,6 +254,7 @@ CREATE TABLE request_subcategories (
 -- =====================================================================
 CREATE TABLE approximate_values (
     id INT PRIMARY KEY AUTO_INCREMENT,
+    code VARCHAR(10) NOT NULL UNIQUE,
     label VARCHAR(100) NOT NULL,
     min_amount DECIMAL(12,2),
     max_amount DECIMAL(12,2),
@@ -261,6 +266,7 @@ CREATE TABLE approximate_values (
 -- =====================================================================
 CREATE TABLE request_statuses (
     id INT PRIMARY KEY AUTO_INCREMENT,
+    code VARCHAR(10) NOT NULL UNIQUE,
     label VARCHAR(50) NOT NULL,
     order_sequence INT NOT NULL,
     is_active BOOLEAN DEFAULT TRUE
@@ -329,4 +335,23 @@ CREATE TABLE service_request_logs (
     FOREIGN KEY (category_id) REFERENCES request_categories(id),
     FOREIGN KEY (subcategory_id) REFERENCES request_subcategories(id),
     FOREIGN KEY (approximate_value_id) REFERENCES approximate_values(id)
+);
+
+
+CREATE TABLE vendor_request_responses (
+id INT AUTO_INCREMENT PRIMARY KEY,
+request_id INT,
+vendor_id INT,
+quotation_sent BOOLEAN,
+sent_method VARCHAR(50),
+sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE service_request_resolutions (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    request_id VARCHAR(20) NOT NULL,
+    resolution_number VARCHAR(50) NOT NULL,
+    created_by INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
