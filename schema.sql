@@ -338,6 +338,9 @@ CREATE TABLE service_request_logs (
 );
 
 
+-- =====================================================================
+-- VENODR REQUEST RESPONSES
+-- =====================================================================
 CREATE TABLE vendor_request_responses (
 id INT AUTO_INCREMENT PRIMARY KEY,
 request_id INT,
@@ -348,10 +351,29 @@ sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 
+-- =====================================================================
+-- SERVICE REQUEST RESOLUTIONS
+-- =====================================================================
 CREATE TABLE service_request_resolutions (
     id INT AUTO_INCREMENT PRIMARY KEY,
     request_id VARCHAR(20) NOT NULL,
     resolution_number VARCHAR(50) NOT NULL,
     created_by INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+-- =====================================================================
+-- QUOTATIONS
+-- =====================================================================
+CREATE TABLE quotations (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    req_id INT NOT NULL,
+    vendor_id INT NOT NULL,
+    vendor_user_id INT,
+    quo_sent_method VARCHAR(50),
+    quo_send_date DATETIME,
+    status VARCHAR(50) DEFAULT 'PENDING',
+
+    UNIQUE (req_id, vendor_id)
 );
