@@ -101,7 +101,6 @@ const SocietyDetails = () => {
                                 <th>Email</th>
                                 <th>Role</th>
                                 <th>Active</th>
-                                {/* <th>Actions</th> */}
                             </tr>
                         </thead>
                         <tbody>

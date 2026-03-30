@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const CreateServiceRequest = ({ editMode = false }) => {
-    const { societyId, id } = useParams(); // id is only for edit
+    const { societyId, id } = useParams();
     const navigate = useNavigate();
 
     const [formData, setFormData] = useState({

@@ -49,7 +49,7 @@ const VendorUserForm = () => {
         email: user.email,
         mobile_country_code: user.mobile_country_code || '+91',
         mobile_number: user.mobile_number || '',
-        password: '', // Don't populate password
+        password: '',
         full_name: user.full_name,
         role: user.role,
         is_primary_contact: user.is_primary_contact === 1,
@@ -77,7 +77,6 @@ const VendorUserForm = () => {
 
     try {
       const submitData = { ...formData }
-      // Only include password if it's provided (for updates)
       if (!submitData.password || submitData.password.trim() === '') {
         delete submitData.password
       }

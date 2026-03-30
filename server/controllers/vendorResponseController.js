@@ -9,7 +9,7 @@ class VendorResponseController {
             const vendorId = req.user.id;
             const { request_id, sent_method } = req.body;
     
-            // 1️⃣ Save vendor quotation response
+            //Save vendor quotation response
             await db.query(
             `
             INSERT INTO vendor_request_responses
@@ -19,7 +19,7 @@ class VendorResponseController {
             [request_id, vendorId, sent_method]
             );
     
-            // 2️⃣ Update service request status → QUOTATIONS_RECEIVED
+            // Update service request status → QUOTATIONS_RECEIVED
             await db.query(
             `
             UPDATE service_requests

@@ -49,7 +49,7 @@ class Society {
     return this.getById(result.insertId);
   }
 
-  // Update society  ✅ FIXED LIKE VENDOR
+  // Update society FIXED LIKE VENDOR
   static async update(id, societyData) {
     const fields = [];
     const values = [];
@@ -77,7 +77,7 @@ class Society {
       return this.getById(id);
     }
 
-    // ✅ force server-side timestamp
+    //force server-side timestamp
     fields.push('updated_at = NOW()');
 
     values.push(id);

@@ -6,7 +6,6 @@ const SocietyUserForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const isEdit = !!id;
-  const isSelfEdit = window.location.pathname.includes("/society-users/edit");
 
   const [societies, setSocieties] = useState([]);
   const [formData, setFormData] = useState({

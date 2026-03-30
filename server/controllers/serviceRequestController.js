@@ -15,20 +15,20 @@ class ServiceRequestController {
             }
 
             const query = `
-SELECT sr.id,
-       sr.request_no,
-       sr.summary,
-       rs.id as status_id,
-       rs.label as status,
-       p.label as priority,
-       su.full_name as created_by_name
-FROM service_requests sr
-JOIN request_statuses rs ON sr.status_id = rs.code
-JOIN priorities p ON sr.priority_id = p.code
-JOIN society_users su ON sr.created_by_user_id = su.id
-WHERE sr.society_id = ?
-ORDER BY sr.created_at DESC
-`;
+                SELECT sr.id,
+                       sr.request_no,
+                       sr.summary,
+                       rs.id as status_id,
+                       rs.label as status,
+                       p.label as priority,
+                       su.full_name as created_by_name
+                FROM service_requests sr
+                JOIN request_statuses rs ON sr.status_id = rs.code
+                JOIN priorities p ON sr.priority_id = p.code
+                JOIN society_users su ON sr.created_by_user_id = su.id
+                WHERE sr.society_id = ?
+                ORDER BY sr.created_at DESC
+                `;
 
             const [rows] = await db.query(query, [societyIdFromToken]);
 
@@ -111,14 +111,14 @@ ORDER BY sr.created_at DESC
         try {
             await connection.beginTransaction();
 
-            // 1️⃣ Get existing record
+            //Get existing record
             const oldData = await ServiceRequest.findById(id);
 
             if (!oldData) {
                 return res.status(404).json({ message: "Request not found" });
             }
 
-            // 2️⃣ Attach user id for log
+            //Attach user id for log
             oldData.action_by_user_id = req.user.id;
 
             await ServiceRequestLog.create(oldData, connection);
@@ -242,76 +242,76 @@ ORDER BY sr.created_at DESC
     static async getPublishedRequests(req, res) {
 
         try {
-    
+
             const vendorId = req.user.id;
-    
+
             const requests = await ServiceRequest.getPublishedRequests(vendorId);
-    
+
             res.json(requests);
-    
+
         } catch (error) {
-    
+
             console.error(error);
             res.status(500).json({ error: error.message });
-    
+
         }
     }
 
     static async createResolution(req, res) {
 
         try {
-    
+
             const { request_id, resolution_number } = req.body;
             const userId = req.user.id;
-    
-            // 1️⃣ Insert into resolution table
+
+            //Insert into resolution table
             await db.query(
-            `
+                `
             INSERT INTO service_request_resolutions
             (request_id, resolution_number, created_by)
             VALUES (?, ?, ?)
             `,
-            [request_id, resolution_number, userId]
+                [request_id, resolution_number, userId]
             );
-    
-            // 2️⃣ Update main request
+
+            // Update main request
             await ServiceRequest.createResolution(
                 request_id,
                 resolution_number
             );
-    
+
             res.json({
                 message: "Resolution created successfully"
             });
-    
+
         } catch (error) {
-    
+
             console.error("CREATE RESOLUTION ERROR:", error);
             res.status(500).json({ error: error.message });
-    
+
         }
-    
+
     }
 
     static async issueWorkOrder(req, res) {
 
         try {
-    
+
             const { request_id } = req.body;
-    
+
             await ServiceRequest.issueWorkOrder(request_id);
-    
+
             res.json({
                 message: "Work order issued"
             });
-    
+
         } catch (error) {
-    
+
             console.error("WORK ORDER ERROR:", error);
             res.status(500).json({ error: error.message });
-    
+
         }
-    
+
     }
 
 }
