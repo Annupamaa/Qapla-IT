@@ -37,6 +37,8 @@ import AllServiceRequests from "./components/societyUsers/AllServiceRequests";
 import MyServiceRequests from "./components/societyUsers/MyServiceRequests";
 import VendorServiceRequests from "./components/vendorUsers/VendorServiceRequests";
 import VendorRequestDetails from "./components/vendorUsers/VendorRequestDetails"
+import VendorWorkOrders from "./components/vendorUsers/VendorWorkOrders";
+import VendorQuotations from "./components/vendorUsers/VendorQuotations";
 import "./App.css";
 
 function AppLayout({ children }) {
@@ -174,7 +176,21 @@ function App() {
                       </li>
 
                       <li>
-                        <NavLink to="/vendor/service-requests">Service Requests</NavLink>
+                        <NavLink to="/vendor/service-requests">
+                          Service Requests
+                        </NavLink>
+                      </li>
+
+                      <li>
+                        <NavLink to="/vendor/quotations">
+                          My Quotations
+                        </NavLink>
+                      </li>
+
+                      <li>
+                        <NavLink to="/vendor/work-orders">
+                          Work Orders
+                        </NavLink>
                       </li>
                     </>
                   )}
@@ -243,6 +259,22 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={["VENDOR_USER"]}>
                   <VendorRequestDetails />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/vendor/work-orders"
+              element={
+                <ProtectedRoute allowedRoles={["VENDOR_USER"]}>
+                  <VendorWorkOrders />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/vendor/quotations"
+              element={
+                <ProtectedRoute allowedRoles={["VENDOR_USER"]}>
+                  <VendorQuotations />
                 </ProtectedRoute>
               }
             />

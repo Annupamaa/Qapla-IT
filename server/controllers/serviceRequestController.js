@@ -242,18 +242,30 @@ class ServiceRequestController {
     static async getPublishedRequests(req, res) {
 
         try {
-
-            const vendorId = req.user.id;
-
+    
+            const userId = req.user.id;
+    
+            //  GET vendor_id from vendor_users
+            const [vendorUser] = await db.query(
+                `SELECT vendor_id FROM vendor_users WHERE id = ?`,
+                [userId]
+            );
+    
+            if (!vendorUser.length) {
+                return res.status(400).json({ message: "Vendor user not found" });
+            }
+    
+            const vendorId = vendorUser[0].vendor_id;
+    
             const requests = await ServiceRequest.getPublishedRequests(vendorId);
-
+    
             res.json(requests);
-
+    
         } catch (error) {
-
+    
             console.error(error);
             res.status(500).json({ error: error.message });
-
+    
         }
     }
 
@@ -299,7 +311,10 @@ class ServiceRequestController {
 
             const { request_id } = req.body;
 
-            await ServiceRequest.issueWorkOrder(request_id);
+            await ServiceRequest.issueWorkOrder(
+                request_id,
+                req.user.id
+            );
 
             res.json({
                 message: "Work order issued"

@@ -374,6 +374,16 @@ CREATE TABLE quotations (
     quo_sent_method VARCHAR(50),
     quo_send_date DATETIME,
     status VARCHAR(50) DEFAULT 'PENDING',
-
     UNIQUE (req_id, vendor_id)
+);
+
+
+CREATE TABLE work_orders (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    request_id INT NOT NULL,
+    vendor_id INT NOT NULL,
+    quotation_id INT NOT NULL,
+    issued_by INT,
+    issued_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    status VARCHAR(50) DEFAULT 'ISSUED'
 );

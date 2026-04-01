@@ -210,15 +210,43 @@ class ServiceRequest {
         await db.query(query, [resolution_number, request_id]);
     }
     
-    static async issueWorkOrder(request_id) {
+    static async issueWorkOrder(request_id, userId) {
+
+        //  Get quotation 
+        const [quotation] = await db.query(
+            `SELECT id, vendor_id 
+             FROM quotations 
+             WHERE req_id = ? 
+             LIMIT 1`,
+            [request_id]
+        );
     
-        const query = `
+        if (!quotation.length) {
+            throw new Error("No quotation found");
+        }
+    
+        const quotationId = quotation[0].id;
+        const vendorId = quotation[0].vendor_id;
+    
+        // Insert work order
+        await db.query(
+            `
+            INSERT INTO work_orders
+            (request_id, vendor_id, quotation_id, issued_by)
+            VALUES (?, ?, ?, ?)
+            `,
+            [request_id, vendorId, quotationId, userId]
+        );
+    
+        //  Update status
+        await db.query(
+            `
             UPDATE service_requests
             SET status_id = 'WOI'
             WHERE id = ?
-        `;
-    
-        await db.query(query, [request_id]);
+            `,
+            [request_id]
+        );
     }
 }
 
