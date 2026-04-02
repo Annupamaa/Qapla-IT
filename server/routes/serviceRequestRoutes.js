@@ -91,5 +91,9 @@ router.get(
   ServiceRequestController.getRequestHistory,
 );
 
+router.put("/:id/invoice-received", ServiceRequestController.markInvoiceReceived);
+router.put("/:id/payment-done", ServiceRequestController.markPaymentDone);
+router.put("/:id/receipt-received", ServiceRequestController.markReceiptReceived);
+router.put("/:id/close", ServiceRequestController.closeRequest);
 
 module.exports = router;
