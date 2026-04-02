@@ -44,11 +44,11 @@ class ServiceRequest {
 
         await db.query(
             `INSERT INTO service_requests
-            (id, request_no, status_id, priority_id, trigger_id,
-             category_id, subcategory_id,
-             approximate_value_id, summary, description,
-             society_id, created_by_user_id)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      (id, request_no, status_id, priority_id, trigger_id,
+       category_id, subcategory_id,
+       approximate_value_id, summary, description,
+       society_id, created_by_user_id)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 newId,
                 requestNo,
@@ -71,55 +71,44 @@ class ServiceRequest {
     static async findById(id) {
 
         const query = `
-            SELECT 
-                sr.id,
-                sr.request_no,
-                sr.summary,
-                sr.description,
+      SELECT 
+        sr.id,
+        sr.request_no,
+        sr.summary,
+        sr.description,
     
-                rc.label AS category,
-                p.label AS priority,
-                sr.approximate_value_id AS approx_value,
+        rc.label AS category,
+        p.label AS priority,
+        sr.approximate_value_id AS approx_value,
     
-                s.legal_name AS society_name,
-                su.full_name AS contact_person,
-                su.mobile_number AS phone,
-                su.email
+        s.legal_name AS society_name,
+        su.full_name AS contact_person,
+        su.mobile_number AS phone,
+        su.email
     
-            FROM service_requests sr
-    
-            LEFT JOIN request_categories rc 
-                ON sr.category_id = rc.code
-    
-            LEFT JOIN priorities p
-                ON sr.priority_id = p.code
-    
-            LEFT JOIN societies s
-                ON sr.society_id = s.id
-    
-            LEFT JOIN society_users su
-                ON sr.created_by_user_id = su.id
-    
-            WHERE sr.id = ?
-        `;
-    
+      FROM service_requests sr
+      LEFT JOIN request_categories rc ON sr.category_id = rc.code
+      LEFT JOIN priorities p ON sr.priority_id = p.code
+      LEFT JOIN societies s ON sr.society_id = s.id
+      LEFT JOIN society_users su ON sr.created_by_user_id = su.id
+      WHERE sr.id = ?
+    `;
         const [rows] = await db.query(query, [id]);
-    
         return rows[0];
     }
 
     static async update(id, data, userId, connection) {
         const query = `
-        UPDATE service_requests
-        SET status_id = ?,
-            priority_id = ?,
-            trigger_id = ?,
-            category_id = ?,
-            subcategory_id = ?,
-            approximate_value_id = ?,
-            summary = ?,
-            description = ?,
-            updated_by_user_id = ?
+      UPDATE service_requests
+      SET status_id = ?,
+          priority_id = ?,
+          trigger_id = ?,
+          category_id = ?,
+          subcategory_id = ?,
+          approximate_value_id = ?,
+          summary = ?,
+          description = ?,
+          updated_by_user_id = ?
         WHERE id = ?`;
 
         const params = [
@@ -141,10 +130,10 @@ class ServiceRequest {
     static async updateStatus(id, statusCode, userId) {
 
         const query = `
-            UPDATE service_requests
-            SET status_id = ?, updated_by_user_id = ?
-            WHERE id = ?
-        `;
+      UPDATE service_requests
+      SET status_id = ?, updated_by_user_id = ?
+      WHERE id = ?
+    `;
 
         await db.query(query, [statusCode, userId, id]);
     }
@@ -152,7 +141,7 @@ class ServiceRequest {
     static async getAll() {
 
         const [rows] = await db.query(
-            "SELECT * FROM service_requests ORDER BY created_at DESC",
+            "SELECT * FROM service_requests ORDER BY created_at DESC"
         );
         return rows;
     }
@@ -160,93 +149,104 @@ class ServiceRequest {
     static async getPublishedRequests(vendorId) {
 
         const query = `
-            SELECT 
-                sr.id,
-                sr.request_no,
-                sr.summary,
-                sr.description,
-                rc.label AS category,
-                p.label AS priority,
-                sr.approximate_value_id AS approx_value,
-                sr.society_id,
-                rs.label AS status,
-    
-                COALESCE(vr.status,'new') AS vendor_status
-    
-            FROM service_requests sr
-    
-            LEFT JOIN request_categories rc 
-                ON sr.category_id = rc.code
-    
-            LEFT JOIN request_statuses rs 
-                ON sr.status_id = rs.code
-    
-            LEFT JOIN priorities p
-                ON sr.priority_id = p.code
-    
-            LEFT JOIN vendor_request_responses vr
-                ON sr.id = vr.request_id 
-                AND vr.vendor_id = ?
-    
-            WHERE sr.status_id = 'PUB'
-    
-            ORDER BY sr.created_at DESC
-        `;
-    
+      SELECT 
+        sr.id,
+        sr.request_no,
+        sr.summary,
+        sr.description,
+        rc.label AS category,
+        p.label AS priority,
+        sr.approximate_value_id AS approx_value,
+        sr.society_id,
+        rs.label AS status,
+        COALESCE(vr.status,'new') AS vendor_status
+      FROM service_requests sr
+      LEFT JOIN request_categories rc ON sr.category_id = rc.code
+      LEFT JOIN request_statuses rs ON sr.status_id = rs.code
+      LEFT JOIN priorities p ON sr.priority_id = p.code
+      LEFT JOIN vendor_request_responses vr ON sr.id = vr.request_id AND vr.vendor_id = ?
+      WHERE sr.status_id = 'PUB'
+      ORDER BY sr.created_at DESC
+    `;
         const [rows] = await db.query(query, [vendorId]);
-    
         return rows;
     }
 
     static async createResolution(request_id, resolution_number) {
-
         const query = `
-            UPDATE service_requests
-            SET resolution_number = ?,
-                status_id = 'RSD'
-            WHERE id = ?
-        `;
-    
+      UPDATE service_requests
+      SET resolution_number = ?, status_id = 'RSD'
+      WHERE id = ?
+    `;
         await db.query(query, [resolution_number, request_id]);
     }
-    
-    static async issueWorkOrder(request_id, userId) {
 
-        //  Get quotation 
+    //Updated: issueWorkOrder now handles missing quotation
+    static async issueWorkOrder(request_id, userId) {
         const [quotation] = await db.query(
             `SELECT id, vendor_id 
-             FROM quotations 
-             WHERE req_id = ? 
-             LIMIT 1`,
+       FROM quotations 
+       WHERE req_id = ? 
+       LIMIT 1`,
             [request_id]
         );
-    
+
         if (!quotation.length) {
-            throw new Error("No quotation found");
+            console.warn(`Cannot issue work order: No quotation found for request ${request_id}`);
+            // Optionally: return a message instead of throwing
+            return { success: false, message: "No quotation found for this request" };
         }
-    
+
         const quotationId = quotation[0].id;
         const vendorId = quotation[0].vendor_id;
-    
-        // Insert work order
+
         await db.query(
-            `
-            INSERT INTO work_orders
-            (request_id, vendor_id, quotation_id, issued_by)
-            VALUES (?, ?, ?, ?)
-            `,
+            `INSERT INTO work_orders
+       (request_id, vendor_id, quotation_id, issued_by)
+       VALUES (?, ?, ?, ?)`,
             [request_id, vendorId, quotationId, userId]
         );
-    
-        //  Update status
+
         await db.query(
-            `
-            UPDATE service_requests
-            SET status_id = 'WOI'
-            WHERE id = ?
-            `,
+            `UPDATE service_requests
+       SET status_id = 'WOI'
+       WHERE id = ?`,
             [request_id]
         );
+
+        return { success: true, message: "Work order issued successfully" };
+    }
+
+    static async markCompletedWorkOrder(workOrderId, userId) {
+        // Update work_orders table
+        const [wo] = await db.query(
+            `SELECT request_id FROM work_orders WHERE id = ? LIMIT 1`,
+            [workOrderId]
+        );
+
+        if (!wo.length) {
+            throw new Error("Work order not found");
+        }
+
+        const requestId = wo[0].request_id;
+
+        //  Update work_orders
+        await db.query(
+            `UPDATE work_orders
+       SET status = 'COMPLETED', completed_by = ?, completed_at = NOW()
+       WHERE id = ?`,
+            [userId, workOrderId]
+        );
+
+        //  Update service_requests
+        await db.query(
+            `UPDATE service_requests
+       SET status_id = 'COM', updated_by_user_id = ?
+       WHERE id = ?`,
+            [userId, requestId]
+        );
+
+        return { success: true, message: "Work order and service request marked completed" };
     }
 }
 

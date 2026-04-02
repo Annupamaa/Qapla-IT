@@ -36,7 +36,7 @@ const VendorWorkOrders = () => {
             const token = localStorage.getItem("token");
 
             await axios.post(
-                "http://localhost:5001/api/vendor/mark-completed",
+                "http://localhost:5001/api/vendors/mark-completed",
                 { work_order_id: id },
                 {
                     headers: { Authorization: `Bearer ${token}` }
