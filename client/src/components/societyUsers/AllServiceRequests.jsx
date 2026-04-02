@@ -3,7 +3,6 @@ import axios from "axios";
 import { useLocation } from "react-router-dom";
 
 const AllServiceRequests = () => {
-
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -19,9 +18,7 @@ const AllServiceRequests = () => {
   }, [location]);
 
   const fetchRequests = async () => {
-
     try {
-
       setLoading(true);
       setError(null);
 
@@ -36,7 +33,7 @@ const AllServiceRequests = () => {
         "http://localhost:5001/api/service-requests/society",
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
 
       if (Array.isArray(res.data)) {
@@ -45,22 +42,15 @@ const AllServiceRequests = () => {
         setError("Unexpected response from server");
         console.error(res.data);
       }
-
     } catch (err) {
-
       console.error(err);
 
       setError(
-        err.response?.data?.message ||
-        "Failed to fetch service requests"
+        err.response?.data?.message || "Failed to fetch service requests",
       );
-
     } finally {
-
       setLoading(false);
-
     }
-
   };
 
   const systemRole = localStorage.getItem("systemRole");
@@ -69,132 +59,164 @@ const AllServiceRequests = () => {
   const isSecretary = subRole === "SECRETARY";
 
   const handleApprove = async (id) => {
-
     try {
-
       const token = localStorage.getItem("token");
 
       await axios.put(
         `http://localhost:5001/api/service-requests/${id}/approve`,
         {},
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
 
       fetchRequests();
-
     } catch (err) {
-
       alert("Failed to approve request");
-
     }
-
   };
 
   const handleCancel = async (id) => {
-
     try {
-
       const token = localStorage.getItem("token");
 
       await axios.put(
         `http://localhost:5001/api/service-requests/${id}/cancel`,
         {},
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
 
       fetchRequests();
-
     } catch (err) {
-
       alert("Failed to cancel request");
-
     }
-
   };
 
   const handlePublish = async (id) => {
-
     try {
-
       const token = localStorage.getItem("token");
 
       await axios.put(
         `http://localhost:5001/api/service-requests/${id}/publish`,
         {},
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
 
       fetchRequests();
-
     } catch (err) {
-
       alert("Failed to publish request");
-
     }
-
   };
 
   const openResolutionModal = (id) => {
-
     setSelectedRequestId(id);
     setResolutionNumber("");
     setShowResolutionModal(true);
-
   };
 
   const submitResolution = async () => {
-
     try {
-
       const token = localStorage.getItem("token");
 
       await axios.post(
         "http://localhost:5001/api/service-requests/create-resolution",
         {
           request_id: selectedRequestId,
-          resolution_number: resolutionNumber
+          resolution_number: resolutionNumber,
         },
         {
-          headers: { Authorization: `Bearer ${token}` }
-        }
+          headers: { Authorization: `Bearer ${token}` },
+        },
       );
 
       setShowResolutionModal(false);
 
       fetchRequests();
-
     } catch (err) {
-
       alert("Failed to create resolution");
-
     }
-
   };
 
   const issueWorkOrder = async (id) => {
-
     try {
-
       const token = localStorage.getItem("token");
 
       await axios.post(
         "http://localhost:5001/api/service-requests/issue-work-order",
         {
-          request_id: id
+          request_id: id,
         },
         {
-          headers: { Authorization: `Bearer ${token}` }
-        }
+          headers: { Authorization: `Bearer ${token}` },
+        },
       );
 
       fetchRequests();
-
     } catch (err) {
-
       alert("Failed to issue work order");
-
     }
+  };
 
+  const markInvoiceReceived = async (id) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      await axios.put(
+        `http://localhost:5001/api/service-requests/${id}/invoice-received`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+
+      fetchRequests();
+    } catch (err) {
+      alert("Failed to mark invoice received");
+    }
+  };
+
+  const markPaymentDone = async (id) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      await axios.put(
+        `http://localhost:5001/api/service-requests/${id}/payment-done`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+
+      fetchRequests();
+    } catch (err) {
+      alert("Failed to mark payment");
+    }
+  };
+
+  const markReceiptReceived = async (id) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      await axios.put(
+        `http://localhost:5001/api/service-requests/${id}/receipt-received`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+
+      fetchRequests();
+    } catch (err) {
+      alert("Failed to mark receipt");
+    }
+  };
+
+  const closeRequest = async (id) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      await axios.put(
+        `http://localhost:5001/api/service-requests/${id}/close`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } },
+      );
+
+      fetchRequests();
+    } catch (err) {
+      alert("Failed to close request");
+    }
   };
 
   if (loading) return <p>Loading service requests...</p>;
@@ -202,46 +224,30 @@ const AllServiceRequests = () => {
   if (error) return <p style={{ color: "red" }}>{error}</p>;
 
   return (
-
     <div className="container">
-
       <div className="table-container">
-
         <div className="table-header">
-
           <h2>All Service Requests</h2>
-
         </div>
 
         {requests.length === 0 ? (
-
           <p>No service requests found</p>
-
         ) : (
-
           <table>
-
             <thead>
-
               <tr>
-
                 <th>Request No</th>
                 <th>Summary</th>
                 <th>Status</th>
                 <th>Priority</th>
                 <th>Created By</th>
                 {isSecretary && <th>Actions</th>}
-
               </tr>
-
             </thead>
 
             <tbody>
-
               {requests.map((r) => (
-
                 <tr key={r.id}>
-
                   <td>{r.request_no}</td>
                   <td>{r.summary}</td>
                   <td>{r.status}</td>
@@ -249,82 +255,99 @@ const AllServiceRequests = () => {
                   <td>{r.created_by_name}</td>
 
                   {isSecretary && (
-                  <td>
+                    <td>
+                      {r.status_id === 1 && (
+                        <>
+                          <button
+                            className="btn btn-success"
+                            onClick={() => handleApprove(r.id)}
+                          >
+                            Approve
+                          </button>
 
-                    {r.status_id === 1 && (
+                          <button
+                            className="btn btn-danger"
+                            onClick={() => handleCancel(r.id)}
+                          >
+                            Cancel
+                          </button>
+                        </>
+                      )}
 
-                      <>
+                      {r.status_id === 2 && (
+                        <button
+                          className="btn btn-primary"
+                          onClick={() => handlePublish(r.id)}
+                        >
+                          Publish To Vendors
+                        </button>
+                      )}
+
+                      {r.status_id === 4 && (
                         <button
                           className="btn btn-success"
-                          onClick={() => handleApprove(r.id)}
+                          onClick={() => openResolutionModal(r.id)}
                         >
-                          Approve
+                          Create Resolution
                         </button>
+                      )}
 
+                      {r.status_id === 5 && (
                         <button
-                          className="btn btn-danger"
-                          onClick={() => handleCancel(r.id)}
+                          className="btn btn-success"
+                          onClick={() => issueWorkOrder(r.id)}
                         >
-                          Cancel
+                          Issue Work Order
                         </button>
-                      </>
+                      )}
 
-                    )}
+                      {r.status_id === 7 && (
+                        <button
+                          className="btn btn-primary"
+                          onClick={() => markInvoiceReceived(r.id)}
+                        >
+                          Invoice Received
+                        </button>
+                      )}
 
-                    {r.status_id === 2 && (
+                      {r.status_id === 8 && (
+                        <button
+                          className="btn btn-success"
+                          onClick={() => markPaymentDone(r.id)}
+                        >
+                          Payment Done
+                        </button>
+                      )}
 
-                      <button
-                        className="btn btn-primary"
-                        onClick={() => handlePublish(r.id)}
-                      >
-                        Publish To Vendors
-                      </button>
+                      {r.status_id === 9 && (
+                        <button
+                          className="btn btn-success"
+                          onClick={() => markReceiptReceived(r.id)}
+                        >
+                          Receipt Received
+                        </button>
+                      )}
 
-                    )}
-
-                    {r.status_id === 4 && (
-
-                      <button
-                        className="btn btn-success"
-                        onClick={() => openResolutionModal(r.id)}
-                      >
-                        Create Resolution
-                      </button>
-
-                    )}
-
-                    {r.status_id === 5 && (
-
-                      <button
-                        className="btn btn-success"
-                        onClick={() => issueWorkOrder(r.id)}
-                      >
-                        Issue Work Order
-                      </button>
-
-                    )}
-
-                  </td>
+                      {r.status_id === 10 && (
+                        <button
+                          className="btn btn-dark"
+                          onClick={() => closeRequest(r.id)}
+                        >
+                          Close Request
+                        </button>
+                      )}
+                    </td>
                   )}
-
                 </tr>
-
               ))}
-
             </tbody>
-
           </table>
-
         )}
-
       </div>
 
       {showResolutionModal && (
-
         <div className="modal-overlay">
-
           <div className="modal">
-
             <h3>Create Resolution</h3>
 
             <input
@@ -335,11 +358,7 @@ const AllServiceRequests = () => {
             />
 
             <div style={{ marginTop: "10px" }}>
-
-              <button
-                className="btn btn-success"
-                onClick={submitResolution}
-              >
+              <button className="btn btn-success" onClick={submitResolution}>
                 Submit
               </button>
 
@@ -349,19 +368,12 @@ const AllServiceRequests = () => {
               >
                 Cancel
               </button>
-
             </div>
-
           </div>
-
         </div>
-
       )}
-
     </div>
-
   );
-
 };
 
 export default AllServiceRequests;
