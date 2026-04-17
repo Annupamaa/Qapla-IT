@@ -40,7 +40,7 @@ const VendorRequestDetails = () => {
 
         try {
             const token = localStorage.getItem("token");
-    
+
             const res = await axios.post(
                 "/api/vendor-requests/send-quotation",
                 {
@@ -53,22 +53,22 @@ const VendorRequestDetails = () => {
                     }
                 }
             );
-    
+
             console.log(res.data);
             alert("Quotation submitted successfully");
-    
+
             // CLOSE POPUPS
             setShowMethodModal(false);
             setShowModal(false);
-    
+
             // RESET METHOD
             setSelectedMethod("");
-    
+
         } catch (err) {
             console.error("Submission error:", err.response?.data || err.message);
             alert("Error submitting quotation");
         }
-    
+
     };
 
     if (!request) return <div className="loading">Loading request...</div>;
@@ -81,11 +81,44 @@ const VendorRequestDetails = () => {
 
             {/* Request Info */}
             <div className="request-section">
+
+                {/* Contact */}
+                <div className="request-section">
+
+                    <h3>Society Contact</h3>
+
+                    <div className="request-grid">
+                        <div className="request-field">
+                            <label>Society</label>
+                            <span>{request.society_name}</span>
+                        </div>
+
+                        <div className="request-field">
+                            <label>Contact Person</label>
+                            <span>{request.contact_person}</span>
+                        </div>
+
+                        <div className="request-field">
+                            <label>Phone</label>
+                            <span>{request.phone}</span>
+                        </div>
+
+                        <div className="request-field">
+                            <label>Email</label>
+                            <span>{request.email}</span>
+                        </div>
+                    </div>
+
+                </div>
+                <br /> <br />
+
                 <h3>Request Information</h3>
+
+
 
                 <div className="request-grid">
 
-                    <div className="request-field">
+                    {/* <div className="request-field">
                         <label>Request No</label>
                         <span>{request.request_no}</span>
                     </div>
@@ -93,7 +126,7 @@ const VendorRequestDetails = () => {
                     <div className="request-field">
                         <label>Category</label>
                         <span>{request.category}</span>
-                    </div>
+                    </div> */}
 
                     <div className="request-field">
                         <label>Priority</label>
@@ -131,34 +164,6 @@ const VendorRequestDetails = () => {
 
             </div>
 
-            {/* Contact */}
-            <div className="request-section">
-
-                <h3>Society Contact</h3>
-
-                <div className="request-grid">
-                    <div className="request-field">
-                        <label>Society</label>
-                        <span>{request.society_name}</span>
-                    </div>
-
-                    <div className="request-field">
-                        <label>Contact Person</label>
-                        <span>{request.contact_person}</span>
-                    </div>
-
-                    <div className="request-field">
-                        <label>Phone</label>
-                        <span>{request.phone}</span>
-                    </div>
-
-                    <div className="request-field">
-                        <label>Email</label>
-                        <span>{request.email}</span>
-                    </div>
-                </div>
-
-            </div>
 
             {/* Actions */}
             <div className="request-actions">

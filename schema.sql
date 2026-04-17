@@ -91,6 +91,9 @@ CREATE TABLE vendor_users (
     role               ENUM('OWNER','MANAGER','STAFF') NOT NULL,
     is_primary_contact TINYINT(1) DEFAULT 0,
     is_active          TINYINT(1) DEFAULT 1,
+    is_first_login TINYINT(1) DEFAULT 1,
+    reset_token VARCHAR(255),
+    reset_token_expiry DATETIME,
     last_login_at      DATETIME NULL,
     created_at         DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at         DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -173,6 +176,9 @@ CREATE TABLE society_users (
     term_end_date        DATE NULL,
     is_authorized_signatory TINYINT(1) DEFAULT 0,
     approval_limit_amount   DECIMAL(15,2) NULL,
+    is_first_login TINYINT(1) DEFAULT 1,
+    reset_token VARCHAR(255),
+    reset_token_expiry DATETIME,
 
     is_active            TINYINT(1) DEFAULT 1,
     last_login_at        DATETIME NULL,
@@ -286,6 +292,7 @@ CREATE TABLE service_requests (
     category_id INT NOT NULL,
     subcategory_id INT NOT NULL,
     approximate_value_id INT NOT NULL,
+    resolution_number VARCHAR(50),
 
     summary VARCHAR(100) NOT NULL,
     description VARCHAR(500),
@@ -337,19 +344,18 @@ CREATE TABLE service_request_logs (
     FOREIGN KEY (approximate_value_id) REFERENCES approximate_values(id)
 );
 
-
 -- =====================================================================
 -- VENODR REQUEST RESPONSES
 -- =====================================================================
 CREATE TABLE vendor_request_responses (
-id INT AUTO_INCREMENT PRIMARY KEY,
-request_id INT,
-vendor_id INT,
-quotation_sent BOOLEAN,
-sent_method VARCHAR(50),
-sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    request_id VARCHAR(50),
+    vendor_id INT,
+    quotation_sent BOOLEAN,
+    sent_method VARCHAR(50),
+    sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status VARCHAR(30) DEFAULT 'new'
 );
-
 
 -- =====================================================================
 -- SERVICE REQUEST RESOLUTIONS
@@ -361,7 +367,6 @@ CREATE TABLE service_request_resolutions (
     created_by INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-
 
 -- =====================================================================
 -- QUOTATIONS
@@ -377,10 +382,12 @@ CREATE TABLE quotations (
     UNIQUE (req_id, vendor_id)
 );
 
-
+-- =====================================================================
+-- WORK_ORDER
+-- =====================================================================
 CREATE TABLE work_orders (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    request_id INT NOT NULL,
+    request_id VARCHAR(20) NOT NULL,
     vendor_id INT NOT NULL,
     quotation_id INT NOT NULL,
     issued_by INT,

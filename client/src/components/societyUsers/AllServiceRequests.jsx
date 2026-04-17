@@ -57,6 +57,7 @@ const AllServiceRequests = () => {
   const subRole = localStorage.getItem("subRole");
 
   const isSecretary = subRole === "SECRETARY";
+  const isVendor = systemRole === "VENDOR";
 
   const handleApprove = async (id) => {
     try {
@@ -241,7 +242,7 @@ const AllServiceRequests = () => {
                 <th>Status</th>
                 <th>Priority</th>
                 <th>Created By</th>
-                {isSecretary && <th>Actions</th>}
+                {(isSecretary || isVendor) && <th>Actions</th>}
               </tr>
             </thead>
 
@@ -256,7 +257,7 @@ const AllServiceRequests = () => {
 
                   {isSecretary && (
                     <td>
-                      {r.status_id === 1 && (
+                      {r.status_code === "NEW" && (
                         <>
                           <button
                             className="btn btn-success"
@@ -274,7 +275,7 @@ const AllServiceRequests = () => {
                         </>
                       )}
 
-                      {r.status_id === 2 && (
+                      {r.status_code === "APR" && (
                         <button
                           className="btn btn-primary"
                           onClick={() => handlePublish(r.id)}
@@ -283,7 +284,7 @@ const AllServiceRequests = () => {
                         </button>
                       )}
 
-                      {r.status_id === 4 && (
+                      {r.status_code === "QUR" && (
                         <button
                           className="btn btn-success"
                           onClick={() => openResolutionModal(r.id)}
@@ -292,7 +293,7 @@ const AllServiceRequests = () => {
                         </button>
                       )}
 
-                      {r.status_id === 5 && (
+                      {r.status_code === "RSD" && (
                         <button
                           className="btn btn-success"
                           onClick={() => issueWorkOrder(r.id)}
@@ -301,40 +302,57 @@ const AllServiceRequests = () => {
                         </button>
                       )}
 
-                      {r.status_id === 7 && (
-                        <button
-                          className="btn btn-primary"
-                          onClick={() => markInvoiceReceived(r.id)}
-                        >
-                          Invoice Received
-                        </button>
-                      )}
+                      {(isSecretary || isVendor) && (
+                        <td>
 
-                      {r.status_id === 8 && (
-                        <button
-                          className="btn btn-success"
-                          onClick={() => markPaymentDone(r.id)}
-                        >
-                          Payment Done
-                        </button>
-                      )}
+                          {/* VENDOR */}
+                          {isVendor && r.status_code === "WOC" && (
+                            <button
+                              className="btn btn-primary"
+                              onClick={() => sendInvoice(r.id)}
+                            >
+                              Send Invoice
+                            </button>
+                          )}
 
-                      {r.status_id === 9 && (
-                        <button
-                          className="btn btn-success"
-                          onClick={() => markReceiptReceived(r.id)}
-                        >
-                          Receipt Received
-                        </button>
-                      )}
+                          {/* SECRETARY */}
+                          {isSecretary && r.status_code === "WOC" && (
+                            <button
+                              className="btn btn-success"
+                              onClick={() => markInvoiceReceived(r.id)}
+                            >
+                              Invoice Received
+                            </button>
+                          )}
 
-                      {r.status_id === 10 && (
-                        <button
-                          className="btn btn-dark"
-                          onClick={() => closeRequest(r.id)}
-                        >
-                          Close Request
-                        </button>
+                          {isSecretary && r.status_code === "INV" && (
+                            <button
+                              className="btn btn-success"
+                              onClick={() => markPaymentDone(r.id)}
+                            >
+                              Payment Done
+                            </button>
+                          )}
+
+                          {isSecretary && r.status_code === "PAY" && (
+                            <button
+                              className="btn btn-success"
+                              onClick={() => markReceiptReceived(r.id)}
+                            >
+                              Receipt Received
+                            </button>
+                          )}
+
+                          {isSecretary && r.status_code === "REC" && (
+                            <button
+                              className="btn btn-dark"
+                              onClick={() => closeRequest(r.id)}
+                            >
+                              Close Request
+                            </button>
+                          )}
+
+                        </td>
                       )}
                     </td>
                   )}

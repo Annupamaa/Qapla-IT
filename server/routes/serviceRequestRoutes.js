@@ -91,9 +91,35 @@ router.get(
   ServiceRequestController.getRequestHistory,
 );
 
-router.put("/:id/invoice-received", ServiceRequestController.markInvoiceReceived);
-router.put("/:id/payment-done", ServiceRequestController.markPaymentDone);
-router.put("/:id/receipt-received", ServiceRequestController.markReceiptReceived);
-router.put("/:id/close", ServiceRequestController.closeRequest);
+router.put(
+  "/:id/invoice-received",
+  authMiddleware,
+  ServiceRequestController.markInvoiceReceived
+);
+
+router.put(
+  "/:id/payment-done",
+  authMiddleware,
+  ServiceRequestController.markPaymentDone
+);
+
+router.put(
+  "/:id/receipt-received",
+  authMiddleware,
+  ServiceRequestController.markReceiptReceived
+);
+
+router.put(
+  "/:id/close",
+  authMiddleware,
+  ServiceRequestController.closeRequest
+);
+
+router.put(
+  "/:id/send-invoice",
+  authMiddleware,
+  allowRoles("VENDOR_USER"),
+  ServiceRequestController.sendInvoice
+);
 
 module.exports = router;

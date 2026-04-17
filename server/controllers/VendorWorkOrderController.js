@@ -22,17 +22,17 @@ class VendorWorkOrderController {
             const [rows] = await db.query(
                 `
                 SELECT 
-                    wo.id,
-                    wo.status,
-                    wo.request_id,
-                    wo.issued_at,
-                    sr.request_no,
-                    sr.summary,
-                    sr.status_id AS request_status
-                FROM work_orders wo
-                JOIN service_requests sr ON wo.request_id = sr.id
-                WHERE wo.vendor_id = ?
-                ORDER BY wo.issued_at DESC
+    wo.id,
+    wo.status,
+    wo.request_id,
+    wo.issued_at,
+    sr.request_no,
+    sr.summary,
+    sr.status_id AS request_status
+FROM work_orders wo
+JOIN service_requests sr ON wo.request_id = sr.id
+WHERE wo.vendor_id = ?
+ORDER BY wo.issued_at DESC;
                 `,
                 [vendorId]
             );
@@ -61,7 +61,7 @@ class VendorWorkOrderController {
                 return res.status(404).json({ message: "Work order not found" });
             }
 
-            const requestId = workOrders[0].request_id.toString(); 
+            const requestId = workOrders[0].request_id.toString();
 
             //  Update work_orders table
             await db.query(
@@ -77,7 +77,7 @@ class VendorWorkOrderController {
             await db.query(
                 `
                 UPDATE service_requests
-                SET status_id = 'COM',   
+                SET status_id = 'WOC',   
                     updated_at = NOW()
                 WHERE id = ?
                 `,

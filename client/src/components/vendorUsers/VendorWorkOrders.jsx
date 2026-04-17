@@ -50,6 +50,24 @@ const VendorWorkOrders = () => {
         }
     };
 
+    const sendInvoice = async (requestId) => {
+        try {
+            const token = localStorage.getItem("token");
+
+            await axios.put(
+                `http://localhost:5001/api/service-requests/${requestId}/send-invoice`,
+                {},
+                {
+                    headers: { Authorization: `Bearer ${token}` }
+                }
+            );
+
+            fetchOrders(); // refresh UI
+        } catch (err) {
+            alert("Failed to send invoice");
+        }
+    };
+
     const getStatusClass = (status) => {
         if (status === "COMPLETED") return "status-badge sent";
         return "status-badge new";
@@ -98,10 +116,12 @@ const VendorWorkOrders = () => {
                                     </td>
 
                                     <td>
-                                        {new Date(o.issued_at).toLocaleString()}
+                                        {new Date(o.issued_at).toLocaleDateString()}
                                     </td>
 
                                     <td>
+
+                                        {/* STEP 1: Complete Work */}
                                         {o.status === "ISSUED" && (
                                             <button
                                                 className="btn btn-success"
@@ -110,6 +130,17 @@ const VendorWorkOrders = () => {
                                                 Completed
                                             </button>
                                         )}
+
+                                        {/* STEP 2: Send Invoice */}
+                                        {o.status === "COMPLETED" && o.request_status === "WOC" && (
+                                            <button
+                                                className="btn btn-primary"
+                                                onClick={() => sendInvoice(o.request_id)}
+                                            >
+                                                Send Invoice
+                                            </button>
+                                        )}
+
                                     </td>
 
                                 </tr>

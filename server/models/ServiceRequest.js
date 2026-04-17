@@ -241,12 +241,25 @@ class ServiceRequest {
         //  Update service_requests
         await db.query(
             `UPDATE service_requests
-       SET status_id = 'COM', updated_by_user_id = ?
+       SET status_id = 'WOC', updated_by_user_id = ?
        WHERE id = ?`,
             [userId, requestId]
         );
 
         return { success: true, message: "Work order and service request marked completed" };
+    }
+
+    // SEND INVOICE (Vendor)
+    static async sendInvoice(request_id, userId) {
+        await db.query(
+            `UPDATE service_requests
+         SET status_id = 'INV',
+             updated_by_user_id = ?
+         WHERE id = ?`,
+            [userId, request_id]
+        );
+
+        return { success: true, message: "Invoice sent to society" };
     }
 }
 
