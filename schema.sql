@@ -394,3 +394,22 @@ CREATE TABLE work_orders (
     issued_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     status VARCHAR(50) DEFAULT 'ISSUED'
 );
+
+-- =====================================================================					
+-- INSERT CMDS FOR SUPER ADMIN, CRM_VENDOR, CRM_SOCIETY					
+-- =====================================================================					
+
+-- eg., for Admin
+INSERT INTO system_users (email, password_hash, full_name, role)			
+VALUES			
+('admin@pg.com', 'PASTE_HASH', 'Super Admin', 'ADMIN');  
+
+-- eg., for CRM Vendor
+INSERT INTO system_users (email, password_hash, full_name, role)				
+VALUES				
+('crmvendor@pg.com', 'PASTE_HASH', 'CRM Vendor User', 'CRM_VENDOR');	
+
+-- eg., for CRM Society
+INSERT INTO system_users (email, password_hash, full_name, role)				
+VALUES				
+('crmsociety@pg.com', 'PASTE_HASH', 'CRM Society User', 'CRM_SOCIETY');								
