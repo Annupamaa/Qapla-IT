@@ -3,10 +3,17 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { vendorsAPI } from '../../services/api'
 
 const VendorForm = () => {
+
+  // Get vendor ID from route parameters
   const { id } = useParams()
+
+  // Hook used for route navigation
   const navigate = useNavigate()
+
+  // Check whether form is in edit mode
   const isEdit = !!id
 
+  // State used for storing vendor form data
   const [formData, setFormData] = useState({
     legal_name: '',
     trade_name: '',
@@ -45,62 +52,113 @@ const VendorForm = () => {
     status: 'DRAFT',
   })
 
+  // State used for handling loading state
   const [loading, setLoading] = useState(false)
+
+  // State used for storing error messages
   const [error, setError] = useState(null)
 
+  // Fetch vendor details when component loads in edit mode
   useEffect(() => {
+
     if (isEdit) {
       fetchVendor()
     }
+
   }, [id])
 
+  // Function used for fetching vendor details
   const fetchVendor = async () => {
     try {
+
       setLoading(true)
+
+      // API call used for fetching vendor details
       const response = await vendorsAPI.getById(id)
+
+      // Store vendor data in form state
       setFormData(response.data.data)
+
     } catch (err) {
+
+      // Display fetch error message
       setError(err.response?.data?.error || 'Failed to fetch vendor')
+
     } finally {
+
+      // Stop loading state
       setLoading(false)
     }
   }
 
+  // Function used for handling form input changes
   const handleChange = (e) => {
+
     const { name, value, type, checked } = e.target
+
     setFormData((prev) => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
     }))
   }
 
+  // Function used for submitting vendor form
   const handleSubmit = async (e) => {
+
     e.preventDefault()
+
     setLoading(true)
+
     setError(null)
 
     try {
-      // Convert empty strings to null for numeric fields
+
+      // Create copy of form data before submission
       const submitData = { ...formData }
-      if (!submitData.preferred_job_min_value) submitData.preferred_job_min_value = null
-      if (!submitData.preferred_job_max_value) submitData.preferred_job_max_value = null
-      if (!submitData.max_concurrent_jobs) submitData.max_concurrent_jobs = null
-      if (!submitData.emergency_response_time_minutes) submitData.emergency_response_time_minutes = null
-      if (!submitData.average_rating) submitData.average_rating = null
+
+      // Convert empty numeric fields to null
+      if (!submitData.preferred_job_min_value)
+        submitData.preferred_job_min_value = null
+
+      if (!submitData.preferred_job_max_value)
+        submitData.preferred_job_max_value = null
+
+      if (!submitData.max_concurrent_jobs)
+        submitData.max_concurrent_jobs = null
+
+      if (!submitData.emergency_response_time_minutes)
+        submitData.emergency_response_time_minutes = null
+
+      if (!submitData.average_rating)
+        submitData.average_rating = null
 
       if (isEdit) {
+
+        // Update existing vendor
         await vendorsAPI.update(id, submitData)
+
       } else {
+
+        // Create new vendor
         await vendorsAPI.create(submitData)
       }
+
+      // Redirect to vendors list page
       navigate('/vendors')
+
     } catch (err) {
+
+      // Display save error message
       setError(err.response?.data?.error || 'Failed to save vendor')
+
     } finally {
+
+      // Stop loading state
       setLoading(false)
     }
   }
 
+  // Display loading message while fetching vendor details
   if (loading && isEdit) {
     return <div className="loading">Loading vendor...</div>
   }

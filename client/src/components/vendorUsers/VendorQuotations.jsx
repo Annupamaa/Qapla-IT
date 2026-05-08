@@ -3,15 +3,21 @@ import axios from "axios";
 
 const VendorQuotations = () => {
 
+    // State to store quotations data
     const [data, setData] = useState([]);
+
+    // State to handle loading status
     const [loading, setLoading] = useState(true);
 
+    // Function to fetch quotations data from API
     const fetchData = async () => {
 
         try {
 
+            // Get token from local storage
             const token = localStorage.getItem("token");
 
+            // API request to fetch quotations
             const res = await axios.get(
                 "http://localhost:5001/api/vendors/quotations",
                 {
@@ -19,6 +25,7 @@ const VendorQuotations = () => {
                 }
             );
 
+            // Store API response data
             setData(res.data);
 
         } catch (err) {
@@ -27,14 +34,18 @@ const VendorQuotations = () => {
             alert("Failed to load quotations");
 
         } finally {
+
+            // Stop loading after API call completes
             setLoading(false);
         }
     };
 
+    // Runs once when component loads
     useEffect(() => {
         fetchData();
     }, []);
 
+    // Function to return CSS class based on request status
     const getStatusClass = (status) => {
         if (status === "WOI") return "status-badge sent";
         if (status === "WOC") return "status-badge sent";
@@ -76,6 +87,7 @@ const VendorQuotations = () => {
                                 <tr key={item.quotation_id}>
 
                                     <td>{item.request_no}</td>
+
                                     <td>{item.summary}</td>
 
                                     <td>

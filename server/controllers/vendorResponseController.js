@@ -32,7 +32,7 @@ class VendorResponseController {
                 return res.status(400).json({ message: "Quotation already submitted" });
             }
     
-            //  INSERT INTO CORRECT TABLE ✅
+            //  INSERT INTO CORRECT TABLE 
             await db.query(
                 `
                 INSERT INTO quotations

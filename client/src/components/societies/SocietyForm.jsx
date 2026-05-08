@@ -3,10 +3,17 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { societiesAPI } from '../../services/api'
 
 const SocietyForm = () => {
+
+  // Get society ID from URL parameters
   const { id } = useParams()
+
+  // Hook used for navigation between routes
   const navigate = useNavigate()
+
+  // Check whether form is in edit mode
   const isEdit = !!id
 
+  // State used for storing society form data
   const [formData, setFormData] = useState({
     legal_name: '',
     short_name: '',
@@ -34,15 +41,20 @@ const SocietyForm = () => {
     status: 'DRAFT',
   })
 
+  // State used for handling loading state
   const [loading, setLoading] = useState(false)
+
+  // State used for storing error messages
   const [error, setError] = useState(null)
 
+  // Fetch society details when edit mode is active
   useEffect(() => {
     if (isEdit) {
       fetchSociety()
     }
   }, [id])
 
+  // Function used for fetching society details by ID
   const fetchSociety = async () => {
     try {
       setLoading(true)

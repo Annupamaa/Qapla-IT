@@ -4,32 +4,42 @@ import { useNavigate } from "react-router-dom";
 
 const VendorServiceRequests = () => {
 
+    // State to store service requests data
     const [requests, setRequests] = useState([]);
+
+    // Hook for page navigation
     const navigate = useNavigate();
 
+    // Runs once when component loads
     useEffect(() => {
         fetchRequests();
     }, []);
 
+    // Function to fetch published service requests from API
     const fetchRequests = async () => {
 
         try {
 
+            // Get token from local storage
             const token = localStorage.getItem("token");
 
+            // API request to fetch service requests
             const res = await axios.get("/api/service-requests/published", {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
             });
 
+            // Store fetched requests in state
             setRequests(res.data);
 
         } catch (err) {
+
             console.error("Error fetching requests", err);
         }
     };
 
+    // Function to navigate to request details page
     const viewRequest = (id) => {
         navigate(`/vendor/request/${id}`);
     };

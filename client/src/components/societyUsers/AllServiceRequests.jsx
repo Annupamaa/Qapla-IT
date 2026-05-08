@@ -3,32 +3,49 @@ import axios from "axios";
 import { useLocation } from "react-router-dom";
 
 const AllServiceRequests = () => {
+
+  // State used for storing service requests list
   const [requests, setRequests] = useState([]);
+
+  // State used for handling loading state
   const [loading, setLoading] = useState(true);
+
+  // State used for storing error messages
   const [error, setError] = useState(null);
 
+  // State used for controlling resolution modal visibility
   const [showResolutionModal, setShowResolutionModal] = useState(false);
+
+  // State used for storing resolution number input
   const [resolutionNumber, setResolutionNumber] = useState("");
+
+  // State used for storing selected request ID
   const [selectedRequestId, setSelectedRequestId] = useState(null);
 
+  // Hook used for tracking route changes
   const location = useLocation();
 
+  // Fetch service requests when component loads or route changes
   useEffect(() => {
     fetchRequests();
   }, [location]);
 
+  // Function used for fetching all society service requests
   const fetchRequests = async () => {
     try {
+
       setLoading(true);
       setError(null);
 
       const token = localStorage.getItem("token");
 
+      // Validate authentication token
       if (!token) {
         setError("No authentication token found. Please login.");
         return;
       }
 
+      // API call used for fetching service requests
       const res = await axios.get(
         "http://localhost:5001/api/service-requests/society",
         {
@@ -36,31 +53,44 @@ const AllServiceRequests = () => {
         },
       );
 
+      // Store fetched requests data
       if (Array.isArray(res.data)) {
         setRequests(res.data);
       } else {
         setError("Unexpected response from server");
         console.error(res.data);
       }
+
     } catch (err) {
+
       console.error(err);
 
+      // Display fetch error message
       setError(
         err.response?.data?.message || "Failed to fetch service requests",
       );
+
     } finally {
+
+      // Stop loading state
       setLoading(false);
     }
   };
 
+  // Get logged-in user roles from local storage
   const systemRole = localStorage.getItem("systemRole");
   const subRole = localStorage.getItem("subRole");
 
+  // Check if logged-in user is secretary
   const isSecretary = subRole === "SECRETARY";
+
+  // Check if logged-in user is vendor
   const isVendor = systemRole === "VENDOR";
 
+  // Function used for approving service request
   const handleApprove = async (id) => {
     try {
+
       const token = localStorage.getItem("token");
 
       await axios.put(
@@ -69,14 +99,19 @@ const AllServiceRequests = () => {
         { headers: { Authorization: `Bearer ${token}` } },
       );
 
+      // Refresh requests list after approval
       fetchRequests();
+
     } catch (err) {
+
       alert("Failed to approve request");
     }
   };
 
+  // Function used for cancelling service request
   const handleCancel = async (id) => {
     try {
+
       const token = localStorage.getItem("token");
 
       await axios.put(
@@ -85,14 +120,19 @@ const AllServiceRequests = () => {
         { headers: { Authorization: `Bearer ${token}` } },
       );
 
+      // Refresh requests list after cancellation
       fetchRequests();
+
     } catch (err) {
+
       alert("Failed to cancel request");
     }
   };
 
+  // Function used for publishing request to vendors
   const handlePublish = async (id) => {
     try {
+
       const token = localStorage.getItem("token");
 
       await axios.put(
@@ -101,20 +141,27 @@ const AllServiceRequests = () => {
         { headers: { Authorization: `Bearer ${token}` } },
       );
 
+      // Refresh requests list after publishing
       fetchRequests();
+
     } catch (err) {
+
       alert("Failed to publish request");
     }
   };
 
+  // Function used for opening resolution creation modal
   const openResolutionModal = (id) => {
+
     setSelectedRequestId(id);
     setResolutionNumber("");
     setShowResolutionModal(true);
   };
 
+  // Function used for submitting resolution details
   const submitResolution = async () => {
     try {
+
       const token = localStorage.getItem("token");
 
       await axios.post(
@@ -128,16 +175,22 @@ const AllServiceRequests = () => {
         },
       );
 
+      // Close modal after successful submission
       setShowResolutionModal(false);
 
+      // Refresh requests list
       fetchRequests();
+
     } catch (err) {
+
       alert("Failed to create resolution");
     }
   };
 
+  // Function used for issuing work order
   const issueWorkOrder = async (id) => {
     try {
+
       const token = localStorage.getItem("token");
 
       await axios.post(
@@ -150,14 +203,19 @@ const AllServiceRequests = () => {
         },
       );
 
+      // Refresh requests list after issuing work order
       fetchRequests();
+
     } catch (err) {
+
       alert("Failed to issue work order");
     }
   };
 
+  // Function used for marking invoice as received
   const markInvoiceReceived = async (id) => {
     try {
+
       const token = localStorage.getItem("token");
 
       await axios.put(
@@ -166,14 +224,19 @@ const AllServiceRequests = () => {
         { headers: { Authorization: `Bearer ${token}` } },
       );
 
+      // Refresh requests list
       fetchRequests();
+
     } catch (err) {
+
       alert("Failed to mark invoice received");
     }
   };
 
+  // Function used for marking payment as completed
   const markPaymentDone = async (id) => {
     try {
+
       const token = localStorage.getItem("token");
 
       await axios.put(
@@ -182,14 +245,19 @@ const AllServiceRequests = () => {
         { headers: { Authorization: `Bearer ${token}` } },
       );
 
+      // Refresh requests list
       fetchRequests();
+
     } catch (err) {
+
       alert("Failed to mark payment");
     }
   };
 
+  // Function used for marking receipt as received
   const markReceiptReceived = async (id) => {
     try {
+
       const token = localStorage.getItem("token");
 
       await axios.put(
@@ -198,14 +266,19 @@ const AllServiceRequests = () => {
         { headers: { Authorization: `Bearer ${token}` } },
       );
 
+      // Refresh requests list
       fetchRequests();
+
     } catch (err) {
+
       alert("Failed to mark receipt");
     }
   };
 
+  // Function used for closing service request
   const closeRequest = async (id) => {
     try {
+
       const token = localStorage.getItem("token");
 
       await axios.put(
@@ -214,14 +287,19 @@ const AllServiceRequests = () => {
         { headers: { Authorization: `Bearer ${token}` } },
       );
 
+      // Refresh requests list
       fetchRequests();
+
     } catch (err) {
+
       alert("Failed to close request");
     }
   };
 
+  // Display loading message while fetching requests
   if (loading) return <p>Loading service requests...</p>;
 
+  // Display error message if request fetch fails
   if (error) return <p style={{ color: "red" }}>{error}</p>;
 
   return (
