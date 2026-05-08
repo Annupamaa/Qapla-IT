@@ -3,13 +3,21 @@ import axios from "axios";
 
 const VendorWorkOrders = () => {
 
+    // State to store work orders data
     const [orders, setOrders] = useState([]);
+
+    // State to handle loading status
     const [loading, setLoading] = useState(true);
 
+    // Function to fetch work orders from API
     const fetchOrders = async () => {
+
         try {
+
+            // Get token from local storage
             const token = localStorage.getItem("token");
 
+            // API request to fetch work orders
             const res = await axios.get(
                 "http://localhost:5001/api/vendors/work-orders",
                 {
@@ -17,24 +25,36 @@ const VendorWorkOrders = () => {
                 }
             );
 
+            // Store fetched orders in state
             setOrders(res.data);
 
         } catch (err) {
+
             console.error(err);
+
             alert("Failed to load work orders");
+
         } finally {
+
+            // Stop loading after API call finishes
             setLoading(false);
         }
     };
 
+    // Runs once when component loads
     useEffect(() => {
         fetchOrders();
     }, []);
 
+    // Function to mark work order as completed
     const markCompleted = async (id) => {
+
         try {
+
+            // Get token from local storage
             const token = localStorage.getItem("token");
 
+            // API request to update work order status
             await axios.post(
                 "http://localhost:5001/api/vendors/mark-completed",
                 { work_order_id: id },
@@ -43,17 +63,24 @@ const VendorWorkOrders = () => {
                 }
             );
 
+            // Refresh work orders list
             fetchOrders();
 
         } catch (err) {
+
             alert("Failed to update");
         }
     };
 
+    // Function to send invoice for service request
     const sendInvoice = async (requestId) => {
+
         try {
+
+            // Get token from local storage
             const token = localStorage.getItem("token");
 
+            // API request to send invoice
             await axios.put(
                 `http://localhost:5001/api/service-requests/${requestId}/send-invoice`,
                 {},
@@ -62,14 +89,20 @@ const VendorWorkOrders = () => {
                 }
             );
 
-            fetchOrders(); // refresh UI
+            // Refresh UI after invoice is sent
+            fetchOrders();
+
         } catch (err) {
+
             alert("Failed to send invoice");
         }
     };
 
+    // Function to return CSS class based on order status
     const getStatusClass = (status) => {
+
         if (status === "COMPLETED") return "status-badge sent";
+
         return "status-badge new";
     };
 

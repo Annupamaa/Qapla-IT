@@ -4,43 +4,63 @@ import axios from "axios";
 
 const VendorRequestDetails = () => {
 
+    // Get request ID from URL params
     const { id } = useParams();
+
+    // Hook for navigation between pages
     const navigate = useNavigate();
+
+    // State to store request details
     const [request, setRequest] = useState(null);
 
+    // State to control first popup modal
     const [showModal, setShowModal] = useState(false);
+
+    // State to control quotation method popup
     const [showMethodModal, setShowMethodModal] = useState(false);
+
+    // State to store selected quotation method
     const [selectedMethod, setSelectedMethod] = useState("");
 
+    // Runs once when component loads
     useEffect(() => {
         fetchRequest();
     }, []);
 
+    // Function to fetch request details from API
     const fetchRequest = async () => {
 
         try {
 
+            // Get token from local storage
             const token = localStorage.getItem("token");
 
+            // API request to fetch service request details
             const res = await axios.get(`/api/service-requests/${id}`, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
             });
 
+            // Store request data in state
             setRequest(res.data);
 
         } catch (err) {
+
             console.error(err);
         }
 
     };
 
+    // Function to submit quotation with selected method
     const submitQuotation = async (method) => {
 
         try {
+
+            // Get token from local storage
             const token = localStorage.getItem("token");
 
+            // API request to submit quotation
             const res = await axios.post(
                 "/api/vendor-requests/send-quotation",
                 {
@@ -55,22 +75,26 @@ const VendorRequestDetails = () => {
             );
 
             console.log(res.data);
+
             alert("Quotation submitted successfully");
 
-            // CLOSE POPUPS
+            // Close both modals
             setShowMethodModal(false);
             setShowModal(false);
 
-            // RESET METHOD
+            // Reset selected method
             setSelectedMethod("");
 
         } catch (err) {
+
             console.error("Submission error:", err.response?.data || err.message);
+
             alert("Error submitting quotation");
         }
 
     };
 
+    // Show loading message while request data is loading
     if (!request) return <div className="loading">Loading request...</div>;
 
     return (

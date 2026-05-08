@@ -3,11 +3,20 @@ import { useNavigate, useParams } from "react-router-dom";
 import { societyUsersAPI, societiesAPI } from "../../services/api";
 
 const SocietyUserForm = () => {
+
+  // Get user ID from route parameters
   const { id } = useParams();
+
+  // Hook used for page navigation
   const navigate = useNavigate();
+
+  // Check whether form is in edit mode
   const isEdit = !!id;
 
+  // State used for storing society list
   const [societies, setSocieties] = useState([]);
+
+  // State used for storing form input data
   const [formData, setFormData] = useState({
     society_id: "",
     email: "",
@@ -23,28 +32,50 @@ const SocietyUserForm = () => {
     is_active: true,
   });
 
+  // State used for handling loading status
   const [loading, setLoading] = useState(false);
+
+  // State used for storing error messages
   const [error, setError] = useState(null);
 
+  // Fetch societies or user details when component loads
   useEffect(() => {
+
+    // Fetch all societies for dropdown in create mode
     if (!isEdit) fetchSocieties();
+
+    // Fetch existing user details in edit mode
     if (isEdit) fetchUser();
+
   }, [id]);
 
+  // Function used for fetching society list
   const fetchSocieties = async () => {
     try {
+
       const response = await societiesAPI.getAll();
+
+      // Store societies data in state
       setSocieties(response.data.data);
+
     } catch (err) {
+
       console.error("Failed to fetch societies:", err);
     }
   };
 
+  // Function used for fetching user details
   const fetchUser = async () => {
     try {
+
       setLoading(true);
+
+      // API call used for fetching user details
       const response = await societyUsersAPI.getById(id);
+
       const user = response.data.data;
+
+      // Set existing user data into form state
       setFormData({
         society_id: user.society_id,
         email: user.email,
@@ -63,66 +94,110 @@ const SocietyUserForm = () => {
         approval_limit_amount: user.approval_limit_amount || "",
         is_active: user.is_active === 1,
       });
+
     } catch (err) {
+
+      // Display fetch error message
       setError(err.response?.data?.error || "Failed to fetch user");
+
     } finally {
+
+      // Stop loading state
       setLoading(false);
     }
   };
 
+  // Function used for updating form input values
   const handleChange = (e) => {
+
     const { name, value, type, checked } = e.target;
+
     setFormData((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
   };
 
+  // Function used for submitting form data
   const handleSubmit = async (e) => {
+
     e.preventDefault();
+
     setLoading(true);
+
     setError(null);
 
     try {
+
+      // Create copy of form data before submission
       const submitData = { ...formData };
+
+      // Remove password field if empty during update
       if (!submitData.password || submitData.password.trim() === "") {
         delete submitData.password;
       }
 
+      // Convert empty approval limit to null
       if (!submitData.approval_limit_amount)
         submitData.approval_limit_amount = null;
 
       if (isEdit) {
+
+        // Update existing society user
         await societyUsersAPI.update(id, submitData);
+
       } else {
+
+        // Validate password for new user creation
         if (!submitData.password) {
+
           setError("Password is required for new users");
+
           setLoading(false);
+
           return;
         }
+
+        // Create new society user
         await societyUsersAPI.create(submitData);
       }
+
+      // Redirect to society users list page
       navigate("/society-users");
+
     } catch (err) {
+
+      // Display save error message
       setError(err.response?.data?.error || "Failed to save user");
+
     } finally {
+
+      // Stop loading state
       setLoading(false);
     }
   };
 
+  // Display loading message while fetching user data
   if (loading && isEdit) {
     return <div className="loading">Loading user...</div>;
   }
 
   return (
     <div className="form-container">
+
       <h2>{isEdit ? "Edit Society User" : "Create New Society User"}</h2>
 
+      {/* Display error message */}
       {error && <div className="error-message">{error}</div>}
 
+      {/* Society User Form */}
       <form onSubmit={handleSubmit}>
+
         <div className="form-group">
+
           <label>Society *</label>
+
+          {/* Society Dropdown */}
           <select
             name="society_id"
             value={formData.society_id}
@@ -131,6 +206,8 @@ const SocietyUserForm = () => {
             disabled={isEdit}
           >
             <option value="">Select Society</option>
+
+            {/* Loop through societies list */}
             {societies.map((society) => (
               <option key={society.id} value={society.id}>
                 {society.legal_name}
@@ -140,8 +217,11 @@ const SocietyUserForm = () => {
         </div>
 
         <div className="form-row">
+
           <div className="form-group">
+
             <label>Full Name *</label>
+
             <input
               type="text"
               name="full_name"
@@ -152,7 +232,9 @@ const SocietyUserForm = () => {
           </div>
 
           <div className="form-group">
+
             <label>Email *</label>
+
             <input
               type="email"
               name="email"
@@ -164,8 +246,11 @@ const SocietyUserForm = () => {
         </div>
 
         <div className="form-row">
+
           <div className="form-group">
+
             <label>Mobile Country Code</label>
+
             <input
               type="text"
               name="mobile_country_code"
@@ -176,7 +261,9 @@ const SocietyUserForm = () => {
           </div>
 
           <div className="form-group">
+
             <label>Mobile Number</label>
+
             <input
               type="text"
               name="mobile_number"
@@ -187,7 +274,9 @@ const SocietyUserForm = () => {
         </div>
 
         <div className="form-group">
+
           <label>Password {!isEdit && "*"}</label>
+
           <input
             type="password"
             name="password"
@@ -199,8 +288,12 @@ const SocietyUserForm = () => {
         </div>
 
         <div className="form-row">
+
           <div className="form-group">
+
             <label>Role *</label>
+
+            {/* Role Dropdown */}
             <select
               name="role"
               value={formData.role}
@@ -220,8 +313,11 @@ const SocietyUserForm = () => {
         </div>
 
         <div className="form-row">
+
           <div className="form-group">
+
             <label>Term Start Date</label>
+
             <input
               type="date"
               name="term_start_date"
@@ -231,7 +327,9 @@ const SocietyUserForm = () => {
           </div>
 
           <div className="form-group">
+
             <label>Term End Date</label>
+
             <input
               type="date"
               name="term_end_date"
@@ -242,7 +340,9 @@ const SocietyUserForm = () => {
         </div>
 
         <div className="form-group">
+
           <label>Approval Limit Amount</label>
+
           <input
             type="number"
             step="0.01"
@@ -253,7 +353,10 @@ const SocietyUserForm = () => {
         </div>
 
         <div className="form-row">
+
           <div className="form-group">
+
+            {/* Authorized Signatory Checkbox */}
             <label>
               <input
                 type="checkbox"
@@ -266,6 +369,8 @@ const SocietyUserForm = () => {
           </div>
 
           <div className="form-group">
+
+            {/* Active Status Checkbox */}
             <label>
               <input
                 type="checkbox"
@@ -278,10 +383,18 @@ const SocietyUserForm = () => {
           </div>
         </div>
 
+        {/* Form Action Buttons */}
         <div className="form-actions">
-          <button type="submit" className="btn btn-primary" disabled={loading}>
+
+          <button
+            type="submit"
+            className="btn btn-primary"
+            disabled={loading}
+          >
             {loading ? "Saving..." : isEdit ? "Update User" : "Create User"}
           </button>
+
+          {/* Cancel Button */}
           <button
             type="button"
             className="btn btn-secondary"

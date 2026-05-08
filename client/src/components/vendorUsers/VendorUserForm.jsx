@@ -3,11 +3,20 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { vendorUsersAPI, vendorsAPI } from '../../services/api'
 
 const VendorUserForm = () => {
+
+  // Get user ID from URL params
   const { id } = useParams()
+
+  // Hook for page navigation
   const navigate = useNavigate()
+
+  // Check whether form is in edit mode
   const isEdit = !!id
 
+  // State to store vendors list
   const [vendors, setVendors] = useState([])
+
+  // State to store form input values
   const [formData, setFormData] = useState({
     vendor_id: '',
     email: '',
@@ -20,30 +29,46 @@ const VendorUserForm = () => {
     is_active: true,
   })
 
+  // State to handle loading status
   const [loading, setLoading] = useState(false)
+
+  // State to store error messages
   const [error, setError] = useState(null)
 
+  // Runs when component loads or ID changes
   useEffect(() => {
     fetchVendors()
+
     if (isEdit) {
       fetchUser()
     }
   }, [id])
 
+  // Function to fetch all vendors
   const fetchVendors = async () => {
     try {
+
       const response = await vendorsAPI.getAll()
+
       setVendors(response.data.data)
+
     } catch (err) {
+
       console.error('Failed to fetch vendors:', err)
     }
   }
 
+  // Function to fetch user details for edit mode
   const fetchUser = async () => {
     try {
+
       setLoading(true)
+
       const response = await vendorUsersAPI.getById(id)
+
       const user = response.data.data
+
+      // Set fetched user data into form state
       setFormData({
         vendor_id: user.vendor_id,
         email: user.email,
@@ -55,50 +80,80 @@ const VendorUserForm = () => {
         is_primary_contact: user.is_primary_contact === 1,
         is_active: user.is_active === 1,
       })
+
     } catch (err) {
+
       setError(err.response?.data?.error || 'Failed to fetch user')
+
     } finally {
+
       setLoading(false)
     }
   }
 
+  // Function to handle input field changes
   const handleChange = (e) => {
+
     const { name, value, type, checked } = e.target
+
     setFormData((prev) => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
     }))
   }
 
+  // Function to handle form submission
   const handleSubmit = async (e) => {
+
     e.preventDefault()
+
     setLoading(true)
     setError(null)
 
     try {
+
       const submitData = { ...formData }
+
+      // Remove password field if empty during edit
       if (!submitData.password || submitData.password.trim() === '') {
         delete submitData.password
       }
 
+      // Update existing user
       if (isEdit) {
+
         await vendorUsersAPI.update(id, submitData)
+
       } else {
+
+        // Validate password for new user
         if (!submitData.password) {
+
           setError('Password is required for new users')
+
           setLoading(false)
+
           return
         }
+
+        // Create new user
         await vendorUsersAPI.create(submitData)
       }
+
+      // Navigate back to vendor users page
       navigate('/vendor-users')
+
     } catch (err) {
+
       setError(err.response?.data?.error || 'Failed to save user')
+
     } finally {
+
       setLoading(false)
     }
   }
 
+  // Show loading message while fetching user data
   if (loading && isEdit) {
     return <div className="loading">Loading user...</div>
   }

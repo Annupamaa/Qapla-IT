@@ -3,15 +3,24 @@ import { useNavigate } from 'react-router-dom'
 import { vendorsAPI } from '../../services/api'
 
 const VendorList = () => {
+  // State to store vendors data
   const [vendors, setVendors] = useState([])
+
+  // State to handle loading status
   const [loading, setLoading] = useState(true)
+
+  // State to store error messages
   const [error, setError] = useState(null)
+
+  // Hook for page navigation
   const navigate = useNavigate()
 
+  // Runs once when component loads and fetches vendor data
   useEffect(() => {
     fetchVendors()
   }, [])
 
+  // Function to fetch all vendors from API
   const fetchVendors = async () => {
     try {
       setLoading(true)
@@ -25,6 +34,7 @@ const VendorList = () => {
     }
   }
 
+  // Function to delete a vendor after confirmation
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this vendor?')) {
       return
@@ -38,6 +48,7 @@ const VendorList = () => {
     }
   }
 
+  // Shows loading message while data is being fetched
   if (loading) {
     return <div className="loading">Loading vendors...</div>
   }
@@ -48,8 +59,9 @@ const VendorList = () => {
         <h2>Vendors</h2>
         <div style={{ display: 'flex', gap: '10px' }}>
           <button className="btn btn-success" onClick={() => navigate('/vendors/register')}>
-            ✨ Register New Vendor
+            Register New Vendor
           </button>
+
           <button className="btn btn-primary" onClick={() => navigate('/vendors/new')}>
             Add New Vendor
           </button>
@@ -74,6 +86,7 @@ const VendorList = () => {
               <th>Actions</th>
             </tr>
           </thead>
+
           <tbody>
             {vendors.map((vendor) => (
               <tr key={vendor.id}>
@@ -84,6 +97,7 @@ const VendorList = () => {
                 <td>{vendor.pan || '-'}</td>
                 <td>{vendor.gstin || '-'}</td>
                 <td>{vendor.status}</td>
+
                 <td>
                   <button
                     className="btn btn-secondary"
@@ -92,6 +106,7 @@ const VendorList = () => {
                   >
                     Edit
                   </button>
+
                   <button
                     className="btn btn-danger"
                     onClick={() => handleDelete(vendor.id)}
@@ -109,4 +124,3 @@ const VendorList = () => {
 }
 
 export default VendorList
-
